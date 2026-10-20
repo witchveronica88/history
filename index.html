@@ -832,6 +832,117 @@ details[open] > summary { box-shadow: inset 0 -1px 0 var(--line); }
 }
 .toast { bottom: calc(72px + env(safe-area-inset-bottom, 0px)); }
 
+/* 카드 규칙: 카드 = 머리 + ＋ 줄. 펼친 줄은 제목 줄에만 옅은 배경, 첫 단계는 왼쪽 끝에 강조색 막대 */
+:root { --radius: 16px; --pad: 20px; --row: 52px; --stick: 0px; }
+#study-eras, #study-dictionary, #picks-panel { --stick: 60px; }
+.fold-card,
+.record,
+.timeline-list,
+.empty { overflow: clip; border: 1px solid var(--line); border-radius: var(--radius); background: var(--card); }
+.fold-head { padding: var(--pad); border-bottom: 1px solid var(--line); }
+.fold-title { display: flex; align-items: baseline; gap: 10px; }
+.fold-title h3 { min-width: 0; margin: 0; font-size: var(--fs-xl); font-weight: 700; line-height: 1.3; }
+.card-badge {
+  flex: 0 0 auto;
+  margin-left: auto;
+  padding: 2px 10px;
+  border-radius: 999px;
+  background: var(--subtle);
+  color: var(--muted);
+  font-size: var(--fs-s);
+  white-space: nowrap;
+}
+.fold-head p { margin: 8px 0 0; color: var(--muted); font-size: var(--fs-s); }
+
+details > summary,
+details[open] > summary { background: transparent; box-shadow: none; }
+summary::after {
+  content: "";
+  flex: 0 0 auto;
+  width: 11px;
+  height: 11px;
+  margin-right: 2px;
+  background: linear-gradient(var(--muted), var(--muted)) center / 11px 1.5px no-repeat,
+              linear-gradient(var(--muted), var(--muted)) center / 1.5px 11px no-repeat;
+  transform: none;
+  transition: background-size .16s ease;
+}
+details[open] > summary::after { transform: none; background-size: 11px 1.5px, 1.5px 0; }
+
+.fold-row { border-top: 1px solid var(--line); scroll-margin-top: var(--stick); }
+.fold-head + .fold-row,
+.record-top + .fold-row,
+.record-top + .record-actions { border-top: 0; }
+.fold-row > summary,
+.inner-row > summary {
+  display: flex;
+  min-height: var(--row);
+  align-items: center;
+  gap: 12px;
+  padding: 14px var(--pad);
+}
+.row-name { display: flex; flex: 1 1 auto; min-width: 0; align-items: baseline; gap: 8px; }
+.row-name strong { min-width: 0; color: var(--text); font-size: var(--fs-m); font-weight: 700; }
+.row-meta { flex: 0 0 auto; color: var(--muted); font-size: var(--fs-s); font-weight: 400; }
+.row-year { flex: 0 0 auto; color: var(--muted); font-size: var(--fs-s); font-weight: 400; }
+.fold-card > .fold-row[open],
+.record > .fold-row[open] { box-shadow: inset 3px 0 0 var(--accent); }
+.fold-card > .fold-row[open] > summary,
+.record > .fold-row[open] > summary {
+  position: sticky;
+  top: var(--stick);
+  z-index: 3;
+  background: var(--summary);
+  box-shadow: inset 3px 0 0 var(--accent), 0 1px 0 var(--line);
+}
+.fold-body { padding: 14px var(--pad) var(--pad); }
+.fold-body > p { margin: 0; }
+.fold-body > p + p { margin-top: 8px; }
+.fold-years { color: var(--muted); font-size: var(--fs-s); }
+.fold-body .term-definition { color: var(--text); }
+.fold-body .place-add { margin-top: 20px; }
+.fold-body .memo-text { padding: 0; color: var(--text); }
+.fold-body .place-extra { margin: 0; }
+
+/* 안쪽 줄: 카드 폭 전체로 깔되 글은 제자리. 막대는 바깥 막대를 다시 그릴 뿐 따로 두지 않는다 */
+.inner-list { margin: 16px calc(-1 * var(--pad)) calc(-1 * var(--pad)); border-top: 1px solid var(--line); }
+.inner-row { scroll-margin-top: calc(var(--stick) + var(--row)); }
+.inner-row > summary { min-height: var(--row); padding: 12px var(--pad); }
+.inner-row[open] > summary {
+  position: sticky;
+  top: calc(var(--stick) + var(--row));
+  z-index: 2;
+  background: var(--summary);
+  box-shadow: inset 3px 0 0 var(--accent), 0 1px 0 var(--line);
+}
+.inner-row > .inner-body { padding: 14px var(--pad) 16px; }
+.inner-body > .composer-detail-name { margin: 0 0 8px; padding: 0; }
+
+.record-top { padding: var(--pad); }
+.record h3 { font-size: var(--fs-xl); line-height: 1.3; }
+.record .program { padding: var(--pad); }
+.record .program .related-block { margin-top: 0; }
+.timeline-row { padding: 12px var(--pad); }
+.records > .record { scroll-margin-top: 16px; }
+
+/* 카드가 많으면 탭: 알약 탭 한 줄, 가로로 밀고 위에 고정 */
+.card-tabs {
+  position: sticky;
+  top: 0;
+  z-index: 5;
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 8px;
+  margin: 0 -16px 8px;
+  padding: 8px 16px;
+  overflow-x: auto;
+  background: var(--bg);
+  scrollbar-width: none;
+}
+.card-tabs::-webkit-scrollbar { display: none; }
+.study-search-wrap { z-index: 6; }
+.card-tabs > * { flex: 0 0 auto; min-width: auto; padding: 8px 16px; }
+
   </style>
 </head>
 <body>
@@ -853,7 +964,7 @@ details[open] > summary { box-shadow: inset 0 -1px 0 var(--line); }
         <div class="empty" id="empty" role="status"><strong>기록한 방문이 아직 없음</strong><span id="empty-copy">방문 추가를 눌러 박물관과 유적지를 기록하세요.</span></div>
       </section>
       <section id="picks-panel" role="tabpanel" aria-labelledby="filter-picks" hidden>
-        <div class="term-filters" id="place-filters" aria-label="추천 장소 분류"></div>
+        <div class="term-filters card-tabs" id="place-filters" aria-label="추천 장소 분류"></div>
         <div id="place-list"></div>
       </section>
       <p class="footnote">운영 시간과 전시는 바뀔 수 있음. 방문 전 공식 안내 확인. 기록은 이 기기에만 저장됨.</p>
@@ -866,7 +977,7 @@ details[open] > summary { box-shadow: inset 0 -1px 0 var(--line); }
       </div>
 
       <section class="study-panel" id="study-eras" data-study-panel="eras">
-        <nav class="era-tabs" id="region-tabs" aria-label="한국사와 세계사 선택"></nav>
+        <nav class="era-tabs card-tabs" id="region-tabs" aria-label="한국사와 세계사 선택"></nav>
         <div class="era-overviews" id="era-overviews"></div>
       </section>
 
@@ -877,7 +988,7 @@ details[open] > summary { box-shadow: inset 0 -1px 0 var(--line); }
       </section>
 
       <section class="study-panel" id="study-dictionary" data-study-panel="dictionary" hidden>
-        <div class="term-filters" id="dictionary-filters" aria-label="사전 분류"></div>
+        <div class="term-filters card-tabs" id="dictionary-filters" aria-label="사전 분류"></div>
         <div id="dictionary-list"></div>
       </section>
 
@@ -966,9 +1077,20 @@ details[open] > summary { box-shadow: inset 0 -1px 0 var(--line); }
     D.terms.forEach(function (t) { if (termCategories.indexOf(t.category) === -1) termCategories.push(t.category); });
     var placeGroups = [];
     D.places.forEach(function (p) { if (placeGroups.indexOf(p.group) === -1) placeGroups.push(p.group); });
-    var activeTermCategory = termCategories[0];
-    var activePlaceGroup = placeGroups[0];
-    var activeRegion = D.eras[0].region;
+    /* 마지막으로 고른 탭을 기억한다. 저장이 안 되면 첫 탭 */
+    var TAB_KEY = 'history-tabs-v1';
+    var savedTabs = {};
+    try { savedTabs = JSON.parse(window.localStorage.getItem(TAB_KEY)) || {}; } catch (err) { savedTabs = {}; }
+    function saveTab(key, value) {
+      savedTabs[key] = value;
+      try { window.localStorage.setItem(TAB_KEY, JSON.stringify(savedTabs)); } catch (err) {}
+    }
+    function pick(list, saved) { return list.indexOf(saved) !== -1 ? saved : list[0]; }
+    var eraRegions = [];
+    D.eras.forEach(function (e) { if (eraRegions.indexOf(e.region) === -1) eraRegions.push(e.region); });
+    var activeTermCategory = pick(termCategories, savedTabs.term);
+    var activePlaceGroup = pick(placeGroups, savedTabs.place);
+    var activeRegion = pick(eraRegions, savedTabs.region);
     var eraIndex = {};
     D.eras.forEach(function (e, i) { eraIndex[e.name] = i + 1; });
 
@@ -1013,32 +1135,54 @@ details[open] > summary { box-shadow: inset 0 -1px 0 var(--line); }
     }
 
     /* ---------- study: render ---------- */
+    function foldCard(title, badge, desc) {
+      var card = el('section', 'fold-card');
+      var head = el('div', 'fold-head');
+      var t = el('div', 'fold-title');
+      t.appendChild(el('h3', '', title));
+      if (badge) t.appendChild(el('span', 'card-badge', badge));
+      head.appendChild(t);
+      if (desc) head.appendChild(el('p', '', desc));
+      card.appendChild(head);
+      return card;
+    }
+    function foldRow(cls, name, meta, year) {
+      var d = el('details', cls);
+      d.tabIndex = -1;
+      var sm = el('summary');
+      var nm = el('span', 'row-name');
+      nm.appendChild(el('strong', '', name));
+      if (meta) nm.appendChild(el('span', 'row-meta', meta));
+      sm.appendChild(nm);
+      if (year) sm.appendChild(el('span', 'row-year', year));
+      d.appendChild(sm);
+      return d;
+    }
+
     function renderEras() {
       var holder = $('era-overviews');
-      var regions = [];
+      eraRegions.forEach(function (r) {
+        var eras = D.eras.filter(function (e) { return e.region === r; });
+        var count = D.events.filter(function (ev) { return ev.era.split(' · ')[0] === r; }).length;
+        var regionCard = foldCard(r, '시대 ' + eras.length + '개', '시대 ' + eras.length + '개와 사건 ' + count + '개를 시대 순서로 정리함');
+        regionCard.setAttribute('data-region-card', r);
+        regionCard.hidden = r !== activeRegion;
+        holder.appendChild(regionCard);
+      });
       D.eras.forEach(function (era, i) {
-        if (regions.indexOf(era.region) === -1) regions.push(era.region);
-        var group = el('details', 'era-group era-fold');
+        var n = D.events.filter(function (ev) { return ev.era === era.name; }).length;
+        var group = foldRow('fold-row era-row', era.name.split(' · ')[1], '사건 ' + n + '개');
         group.id = 'era-' + (i + 1);
-        group.tabIndex = -1;
         group.setAttribute('data-era-card', era.name);
         group.setAttribute('data-region', era.region);
-        group.hidden = era.region !== activeRegion;
 
-        var gsum = el('summary', 'era-fold-summary');
-        var banner = el('div', 'era-banner');
-        banner.appendChild(el('strong', '', era.name.split(' · ')[1]));
-        banner.appendChild(el('span', '', era.years));
-        gsum.appendChild(banner);
-        group.appendChild(gsum);
-
-        var desc = el('div', 'era-description');
+        var desc = el('div', 'fold-body');
+        desc.appendChild(el('p', 'fold-years', era.years));
         desc.appendChild(el('p', '', era.summary));
-        var notes = el('details', 'era-notes');
-        var ns = el('summary');
-        ns.appendChild(el('span', '', '시대 특징 보기'));
-        notes.appendChild(ns);
-        var nb = el('div', 'era-notes-body');
+        var list = el('div', 'inner-list');
+        list.setAttribute('data-era-events', era.name);
+        var notes = foldRow('inner-row era-notes', '시대 특징', era.points.length + '가지');
+        var nb = el('div', 'inner-body study-card-body');
         appendList(nb, era.points);
         if (era.people) {
           var pr = el('p', 'era-line');
@@ -1060,17 +1204,14 @@ details[open] > summary { box-shadow: inset 0 -1px 0 var(--line); }
         words.appendChild(wl);
         nb.appendChild(words);
         notes.appendChild(nb);
-        desc.appendChild(notes);
+        list.appendChild(notes);
+        desc.appendChild(list);
         group.appendChild(desc);
-
-        var list = el('div', 'era-composer-list');
-        list.setAttribute('data-era-events', era.name);
-        group.appendChild(list);
-        holder.appendChild(group);
+        qsa('[data-region-card]', holder).filter(function (c) { return c.getAttribute('data-region-card') === era.region; })[0].appendChild(group);
       });
 
       var tabs = $('region-tabs');
-      regions.forEach(function (r) {
+      eraRegions.forEach(function (r) {
         var b = el('button', 'era-tab', r);
         b.type = 'button';
         b.setAttribute('aria-pressed', r === activeRegion ? 'true' : 'false');
@@ -1079,18 +1220,11 @@ details[open] > summary { box-shadow: inset 0 -1px 0 var(--line); }
       });
 
       D.events.forEach(function (ev) {
-        var card = el('details', 'nested-composer composer-card');
+        var card = foldRow('inner-row composer-card', ev.title, null, ev.when.split(' · ')[0]);
         card.id = ev.id;
-        card.tabIndex = -1;
         card.setAttribute('data-event-card', ev.title);
-        var sm = el('summary');
-        var row = el('span', 'composer-summary');
-        row.appendChild(el('strong', '', ev.title));
-        row.appendChild(el('span', 'composer-years', ev.when.split(' · ')[0]));
-        sm.appendChild(row);
-        card.appendChild(sm);
 
-        var body = el('div', 'study-card-body');
+        var body = el('div', 'inner-body study-card-body');
         body.appendChild(el('p', 'composer-detail-name', ev.when));
         body.appendChild(el('p', 'event-sum', ev.sum));
         body.appendChild(el('h4', '', '배경'));
@@ -1168,14 +1302,13 @@ details[open] > summary { box-shadow: inset 0 -1px 0 var(--line); }
         var panel = el('section');
         panel.setAttribute('data-dictionary-category', cat);
         panel.hidden = cat !== activeTermCategory;
-        var termList = el('div', 'term-list');
-        D.terms.filter(function (t) { return t.category === cat; }).forEach(function (t) {
-          var row = el('article', 'term-row');
-          row.tabIndex = -1;
+        var catTerms = D.terms.filter(function (t) { return t.category === cat; });
+        var termList = foldCard(cat, catTerms.length + '개');
+        catTerms.forEach(function (t) {
+          var row = foldRow('fold-row term-item', t.name);
           row.setAttribute('data-category', cat);
           row.setAttribute('data-dictionary-card', t.name);
-          row.appendChild(el('strong', 'term-name', t.name));
-          var body = el('div', 'term-body');
+          var body = el('div', 'fold-body');
           body.appendChild(el('p', 'term-definition', t.description));
           var related = [];
           var key = t.name.replace(/[『』]/g, '');
@@ -1217,21 +1350,14 @@ details[open] > summary { box-shadow: inset 0 -1px 0 var(--line); }
         var panel = el('section');
         panel.setAttribute('data-place-panel', g);
         panel.hidden = g !== activePlaceGroup;
-        var box = el('div', 'era-group place-list');
-        D.places.filter(function (p) { return p.group === g; }).forEach(function (p) {
-          var d = el('details', 'nested-composer place-card');
-          d.tabIndex = -1;
+        var groupPlaces = D.places.filter(function (p) { return p.group === g; });
+        var box = foldCard(g, groupPlaces.length + '곳');
+        groupPlaces.forEach(function (p) {
+          var d = foldRow('fold-row place-card', p.name, p.where);
           d.setAttribute('data-place-card', p.name);
-          var sm = el('summary');
-          var row = el('span', 'composer-summary');
-          row.appendChild(el('strong', '', p.name));
-          var right = el('span', 'composer-years', p.where);
-          right.setAttribute('data-place-state', p.name);
-          row.appendChild(right);
-          sm.appendChild(row);
-          d.appendChild(sm);
-          var body = el('div', 'study-card-body');
-          body.appendChild(el('p', 'composer-detail-name', p.where + ' · ' + p.era));
+          d.querySelector('.row-meta').setAttribute('data-place-state', p.name);
+          var body = el('div', 'fold-body');
+          body.appendChild(el('p', 'fold-years', p.where + ' · ' + p.era));
           body.appendChild(el('p', '', p.see));
           if (p.extra && p.extra.length) {
             var xl = el('ul', 'place-extra');
@@ -1253,8 +1379,9 @@ details[open] > summary { box-shadow: inset 0 -1px 0 var(--line); }
     /* ---------- study: region ---------- */
     function setRegion(r) {
       activeRegion = r;
+      saveTab('region', r);
       qsa('#region-tabs .era-tab').forEach(function (b) { b.setAttribute('aria-pressed', b.getAttribute('data-region-jump') === r ? 'true' : 'false'); });
-      qsa('[data-era-card]').forEach(function (g) { g.hidden = g.getAttribute('data-region') !== r; });
+      qsa('[data-region-card]').forEach(function (g) { g.hidden = g.getAttribute('data-region-card') !== r; });
     }
 
     /* ---------- study: navigation ---------- */
@@ -1284,6 +1411,7 @@ details[open] > summary { box-shadow: inset 0 -1px 0 var(--line); }
     }
     function selectTermCategory(cat) {
       activeTermCategory = cat;
+      saveTab('term', cat);
       qsa('#dictionary-filters .term-filter').forEach(function (b) {
         b.setAttribute('aria-pressed', b.getAttribute('data-category') === cat ? 'true' : 'false');
       });
@@ -1291,6 +1419,7 @@ details[open] > summary { box-shadow: inset 0 -1px 0 var(--line); }
     }
     function selectPlaceGroup(g) {
       activePlaceGroup = g;
+      saveTab('place', g);
       qsa('#place-filters .term-filter').forEach(function (b) {
         b.setAttribute('aria-pressed', b.getAttribute('data-place-group') === g ? 'true' : 'false');
       });
@@ -1316,7 +1445,8 @@ details[open] > summary { box-shadow: inset 0 -1px 0 var(--line); }
         if (!ev) return;
         activateStudySection('eras');
         var card = $(ev.id);
-        qsa('.composer-card[open]').forEach(function (c) { if (c !== card) c.open = false; });
+        qsa('.composer-card[open], .era-notes[open]').forEach(function (c) { if (c !== card) c.open = false; });
+        qsa('.era-row[open]').forEach(function (c) { if (c.getAttribute('data-era-card') !== ev.era) c.open = false; });
         setRegion(ev.era.split(' · ')[0]);
         var group = qsa('[data-era-card]').filter(function (g) { return g.getAttribute('data-era-card') === ev.era; })[0];
         if (group) group.open = true;
@@ -1326,6 +1456,7 @@ details[open] > summary { box-shadow: inset 0 -1px 0 var(--line); }
       if (kind === 'era') {
         activateStudySection('eras');
         if (eraByName[value]) setRegion(eraByName[value].region);
+        qsa('.era-row[open]').forEach(function (c) { if (c.getAttribute('data-era-card') !== value) c.open = false; });
         reveal(qsa('[data-era-card]').filter(function (c) { return c.getAttribute('data-era-card') === value; })[0]);
         return;
       }
@@ -1527,25 +1658,23 @@ details[open] > summary { box-shadow: inset 0 -1px 0 var(--line); }
             rblock.appendChild(rlist);
             prog.appendChild(rblock);
           }
+          if (prog.childNodes.length) card.appendChild(prog);
           if (r.info && r.info.length) {
-            var idet = el('details', 'record-memo');
-            var ism = el('summary');
-            ism.appendChild(el('span', '', '박물관 정보'));
-            idet.appendChild(ism);
+            var idet = foldRow('fold-row record-row', '박물관 정보', r.info.length + '가지');
+            var ib = el('div', 'fold-body');
             var iul = el('ul', 'place-extra');
             r.info.forEach(function (x) { iul.appendChild(el('li', '', x)); });
-            idet.appendChild(iul);
-            prog.appendChild(idet);
+            ib.appendChild(iul);
+            idet.appendChild(ib);
+            card.appendChild(idet);
           }
           if (r.memo) {
-            var det = el('details', 'record-memo');
-            var sm = el('summary');
-            sm.appendChild(el('span', '', '메모'));
-            det.appendChild(sm);
-            det.appendChild(el('p', 'memo-text', r.memo));
-            prog.appendChild(det);
+            var det = foldRow('fold-row record-row', '메모');
+            var mb = el('div', 'fold-body');
+            mb.appendChild(el('p', 'memo-text', r.memo));
+            det.appendChild(mb);
+            card.appendChild(det);
           }
-          card.appendChild(prog);
         }
         var actions = el('div', 'record-actions');
         var edit = el('button', '', '수정');
@@ -1747,6 +1876,15 @@ details[open] > summary { box-shadow: inset 0 -1px 0 var(--line); }
         showScreen('visits');
         openSheet(null, { title: p.name, venue: p.where });
       }
+    });
+
+    /* 위에 붙어 있던 제목을 눌러 접으면 화면을 제목 자리로 돌린다 */
+    document.addEventListener('click', function (event) {
+      var sm = event.target.closest('summary');
+      if (!sm || !sm.parentNode.open) return;
+      var d = sm.parentNode;
+      if (sm.getBoundingClientRect().top - d.getBoundingClientRect().top < 1) return;
+      window.requestAnimationFrame(function () { d.scrollIntoView({ block: 'start' }); });
     });
 
     $('add-record').addEventListener('click', function () { openSheet(null); });
