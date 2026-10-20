@@ -18,6 +18,7 @@
   --text: #1C1F23;
   --muted: #5B626A;
   --line: #DEE1E5;
+  --rule: #C4C9CF;
   --accent: #0D6B6B;
   --accent-soft: #DCEEEE;
   --on-accent: #FFFFFF;
@@ -35,6 +36,7 @@
     --text: #E8EAED;
     --muted: #A3AAB1;
     --line: #30353A;
+    --rule: #4A5056;
     --accent: #5CC4BE;
     --accent-soft: #1F3B3A;
     --on-accent: #0B1F1F;
@@ -52,6 +54,7 @@
   --text: #E8EAED;
   --muted: #A3AAB1;
   --line: #30353A;
+  --rule: #4A5056;
   --accent: #5CC4BE;
   --accent-soft: #1F3B3A;
   --on-accent: #0B1F1F;
@@ -686,7 +689,6 @@ details:not([open]) > :not(summary) { display: none; }
 
 :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 @media (max-width: 440px) {
-  .wrap { padding-top: 16px; }
   .record-top { grid-template-columns: 56px minmax(0, 1fr); gap: 12px; }
   .date-block { padding-right: 12px; }
   .term-row { grid-template-columns: 1fr; gap: 4px; }
@@ -791,8 +793,28 @@ details[open] > summary { box-shadow: inset 0 -1px 0 var(--line); }
 
 /* Bottom navigation and screen header */
 .wrap { padding-bottom: calc(96px + env(safe-area-inset-bottom, 0px)); }
-.screen-head { margin: 0 0 20px; }
-.screen-head h1 { margin: 0; font-size: var(--fs-xl); font-weight: 700; line-height: 1.35; }
+/* 화면 맨 위 제목: 카드 제목보다 작게, 가운데, 양옆에 가는 두 줄. 위에 고정하지 않는다 */
+.wrap { padding-top: 0; }
+.screen-head { margin: 0 0 12px; padding: 12px 0 0; text-align: center; }
+.screen-head h1 {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  margin: 0;
+  font-size: var(--fs-l);
+  font-weight: 700;
+  line-height: 1.4;
+  letter-spacing: 0.04em;
+}
+.screen-head h1::before,
+.screen-head h1::after {
+  content: "";
+  width: 36px;
+  height: 4px;
+  border-top: 1px solid var(--rule);
+  border-bottom: 1px solid var(--rule);
+}
 .screen-head p { margin: 4px 0 0; color: var(--muted); font-size: var(--fs-s); }
 .bottom-tabs {
   position: fixed;
