@@ -670,7 +670,6 @@ details:not([open]) > :not(summary) { display: none; }
 }
 .note-field textarea:focus { border-color: var(--accent); }
 
-.footnote { margin: 24px 0 0; color: var(--muted); font-size: var(--fs-s); }
 .toast {
   position: fixed;
   left: 50%;
@@ -707,13 +706,10 @@ details:not([open]) > :not(summary) { display: none; }
 .term-row .related-label { margin: 0; }
 .term-filters { gap: 8px; }
 .add-record { display: block; width: 100%; min-height: 48px; margin: 0 0 16px; padding: 8px 16px; border: 1px dashed var(--accent); border-radius: 12px; background: transparent; color: var(--accent); font-size: var(--fs-m); font-weight: 700; }
-.record-actions { display: flex; justify-content: flex-end; border-top: 1px solid var(--line); }
-.record-actions button { min-height: 44px; padding: 8px 16px; border: 0; background: transparent; color: var(--accent); font-size: var(--fs-m); font-weight: 700; }
 .artist-links { display: flex; flex-wrap: wrap; gap: 0 16px; }
 .artist-links .study-link { min-height: 36px; }
 .memo-text { margin: 0; padding: 0 16px 16px; color: var(--muted); white-space: pre-wrap; }
 .record-memo > summary { padding-left: 0; padding-right: 0; }
-.record .program { padding-bottom: 8px; }
 .empty { padding: 32px 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--card); color: var(--muted); text-align: center; }
 .sheet-backdrop { position: fixed; inset: 0; z-index: 20; background: var(--backdrop); }
 .sheet { position: fixed; left: 50%; bottom: 0; z-index: 21; width: min(100%, 560px); max-height: 92vh; overflow-y: auto; transform: translateX(-50%); padding: 8px 16px calc(24px + env(safe-area-inset-bottom)); border-radius: 16px 16px 0 0; background: var(--card); }
@@ -768,8 +764,6 @@ details[open] > summary { box-shadow: inset 0 -1px 0 var(--line); }
 .related-label, .related-block .study-link, .related-block .genre-text, .era-genres .study-link, .era-genres .genre-text { font-size: var(--fs-s); }
 .related-label { display: block; flex: 0 0 auto; margin: 0; color: var(--muted); font-weight: 400; }
 .record-memo { margin-top: 16px; border-top: 0; }
-.record .program { padding: 4px 16px 16px; }
-.record .program .related-block { margin-top: 16px; }
 .related-block .study-link, .related-block .genre-text { min-height: 0; padding: 0; font-weight: 400; line-height: 1.6; }
 .timeline-row { grid-template-columns: 96px minmax(0, 1fr); }
 .timeline-when { display: grid; gap: 2px; }
@@ -815,7 +809,6 @@ details[open] > summary { box-shadow: inset 0 -1px 0 var(--line); }
   border-top: 1px solid var(--rule);
   border-bottom: 1px solid var(--rule);
 }
-.screen-head p { margin: 4px 0 0; color: var(--muted); font-size: var(--fs-s); }
 .bottom-tabs {
   position: fixed;
   left: 50%;
@@ -842,6 +835,8 @@ details[open] > summary { box-shadow: inset 0 -1px 0 var(--line); }
   white-space: nowrap;
 }
 .bottom-tab[aria-selected="true"] { color: var(--accent); }
+.bottom-tab { display: grid; justify-items: center; align-content: center; gap: 2px; min-height: 60px; padding: 6px 2px; }
+.bottom-tab svg { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
 .bottom-tab[aria-selected="true"]::before {
   content: "";
   position: absolute;
@@ -894,8 +889,7 @@ details[open] > summary::after { transform: none; background-size: 11px 1.5px, 1
 .fold-row { border-top: 1px solid var(--line); scroll-margin-top: var(--stick); }
 .fold-card { scroll-margin-top: var(--stick); }
 .fold-head + .fold-row,
-.record-top + .fold-row,
-.record-top + .record-actions { border-top: 0; }
+.record-top + .fold-row { border-top: 0; }
 .fold-row > summary {
   display: flex;
   min-height: var(--row);
@@ -906,6 +900,10 @@ details[open] > summary::after { transform: none; background-size: 11px 1.5px, 1
 .row-name { display: flex; flex: 1 1 auto; min-width: 0; align-items: baseline; gap: 8px; }
 .row-name strong { min-width: 0; color: var(--text); font-size: var(--fs-m); font-weight: 700; }
 .row-meta { flex: 0 0 auto; color: var(--muted); font-size: var(--fs-s); font-weight: 400; }
+.row-year,
+.card-badge,
+.timeline-year,
+.date-block { font-variant-numeric: tabular-nums; }
 .row-year { flex: 0 0 auto; color: var(--muted); font-size: var(--fs-s); font-weight: 400; }
 .fold-card > .fold-row[open],
 .record > .fold-row[open] { box-shadow: inset 3px 0 0 var(--accent); }
@@ -925,13 +923,12 @@ details[open] > summary::after { transform: none; background-size: 11px 1.5px, 1
 .fold-body .place-add { margin-top: 20px; }
 .fold-body .memo-text { padding: 0; color: var(--text); }
 .fold-body .place-extra { margin: 0; }
+.fold-body .place-extra + .related-block { margin-top: 16px; }
 .fold-body > .composer-detail-name { margin: 0 0 8px; padding: 0; }
 .fold-card > .era-notes { margin-top: 0; }
 
 .record-top { padding: var(--pad); }
 .record h3 { font-size: var(--fs-l); line-height: 1.35; }
-.record .program { padding: var(--pad); }
-.record .program .related-block { margin-top: 0; }
 .timeline-row { padding: 12px var(--pad); }
 .records > .record { scroll-margin-top: 16px; }
 
@@ -958,8 +955,7 @@ details[open] > summary::after { transform: none; background-size: 11px 1.5px, 1
 <body>
   <main class="wrap">
     <header class="screen-head">
-      <h1 id="screen-title"></h1>
-      <p id="screen-desc"></p>
+      <h1>역사</h1>
     </header>
 
     <section class="view-panel" id="visit-view" role="tabpanel" aria-labelledby="tab-visits">
@@ -971,13 +967,12 @@ details[open] > summary::after { transform: none; background-size: 11px 1.5px, 1
       </nav>
       <button class="add-record" id="add-record" type="button">방문 추가</button>
       <section class="records" id="records-panel" role="tabpanel" aria-labelledby="filter-all" aria-live="polite" tabindex="0">
-        <div class="empty" id="empty" role="status"><strong>기록한 방문이 아직 없음</strong><span id="empty-copy">방문 추가를 눌러 박물관과 유적지를 기록하세요.</span></div>
+        <div class="empty" id="empty" role="status"><strong>기록한 방문이 아직 없음</strong></div>
       </section>
       <section id="picks-panel" role="tabpanel" aria-labelledby="filter-picks" hidden>
         <div class="term-filters card-tabs" id="place-filters" aria-label="추천 장소 분류"></div>
         <div id="place-list"></div>
       </section>
-      <p class="footnote">운영 시간과 전시는 바뀔 수 있음. 방문 전 공식 안내 확인. 기록은 이 기기에만 저장됨.</p>
     </section>
 
     <section class="view-panel" id="study-view" role="tabpanel" aria-labelledby="tab-eras" hidden>
@@ -1002,16 +997,14 @@ details[open] > summary::after { transform: none; background-size: 11px 1.5px, 1
         <div class="term-filters card-tabs" id="dictionary-filters" aria-label="사전 분류"></div>
         <div id="dictionary-list"></div>
       </section>
-
-      <p class="footnote">시기와 해석이 학자마다 다른 부분은 "경"이나 "설"로 표시함.</p>
     </section>
   </main>
 
   <nav class="bottom-tabs" aria-label="역사 메뉴" role="tablist">
-    <button class="bottom-tab" id="tab-visits" type="button" role="tab" aria-controls="visit-view" aria-selected="true" data-screen="visits">방문 기록</button>
-    <button class="bottom-tab" id="tab-eras" type="button" role="tab" aria-controls="study-view" aria-selected="false" data-screen="eras">시대·사건</button>
-    <button class="bottom-tab" id="tab-timeline" type="button" role="tab" aria-controls="study-view" aria-selected="false" data-screen="timeline">연표</button>
-    <button class="bottom-tab" id="tab-dictionary" type="button" role="tab" aria-controls="study-view" aria-selected="false" data-screen="dictionary">사전</button>
+    <button class="bottom-tab" id="tab-visits" type="button" role="tab" aria-controls="visit-view" aria-selected="true" data-screen="visits"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 10l9-5 9 5"/><path d="M5 10v8M9.5 10v8M14.5 10v8M19 10v8"/><path d="M3 20h18"/></svg><span>방문 기록</span></button>
+    <button class="bottom-tab" id="tab-eras" type="button" role="tab" aria-controls="study-view" aria-selected="false" data-screen="eras"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 3h10M7 21h10"/><path d="M8 3c0 5 8 5 8 9s-8 4-8 9M16 3c0 5-8 5-8 9s8 4 8 9"/></svg><span>시대·사건</span></button>
+    <button class="bottom-tab" id="tab-timeline" type="button" role="tab" aria-controls="study-view" aria-selected="false" data-screen="timeline"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 4v16"/><circle cx="6" cy="7" r="1.6"/><circle cx="6" cy="17" r="1.6"/><path d="M10 7h9M10 12h6M10 17h9"/></svg><span>연표</span></button>
+    <button class="bottom-tab" id="tab-dictionary" type="button" role="tab" aria-controls="study-view" aria-selected="false" data-screen="dictionary"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 6.5C10.5 5.3 8.3 4.8 5 5v13c3.3-.2 5.5.3 7 1.5 1.5-1.2 3.7-1.7 7-1.5V5c-3.3-.2-5.5.3-7 1.5z"/><path d="M12 6.5v13"/></svg><span>사전</span></button>
   </nav>
 
   <div class="sheet-backdrop" id="sheet-backdrop" hidden></div>
@@ -1416,14 +1409,10 @@ details[open] > summary::after { transform: none; background-size: 11px 1.5px, 1
     }
 
     /* ---------- study: navigation ---------- */
-    var SCREENS = {
-      visits: ['방문 기록', '다녀온 박물관·유적지를 적고, 역사와 이어지는 추천 장소를 고름'],
-      eras: ['시대·사건', '한국사와 세계사를 시대별로 보고, 사건은 배경·전개·결과로 정리함'],
-      timeline: ['연표', '한국과 세계의 사건을 연도순으로 모아 봄'],
-      dictionary: ['사전', '역사 글에 자주 나오는 말을 분류별로 풀이함']
-    };
+    var SCREENS = ['visits', 'eras', 'timeline', 'dictionary'];
     function showScreen(name) {
-      if (!SCREENS[name]) name = 'visits';
+      if (SCREENS.indexOf(name) === -1) name = 'visits';
+      saveTab('screen', name);
       bottomTabs.forEach(function (tab) {
         var sel = tab.getAttribute('data-screen') === name;
         tab.setAttribute('aria-selected', sel ? 'true' : 'false');
@@ -1432,8 +1421,6 @@ details[open] > summary::after { transform: none; background-size: 11px 1.5px, 1
       visitView.hidden = name !== 'visits';
       studyView.hidden = name === 'visits';
       studyPanels.forEach(function (p) { p.hidden = p.getAttribute('data-study-panel') !== name; });
-      $('screen-title').textContent = SCREENS[name][0];
-      $('screen-desc').textContent = SCREENS[name][1];
       window.scrollTo(0, 0);
     }
     function activateStudySection(section) {
@@ -1672,8 +1659,15 @@ details[open] > summary::after { transform: none; background-size: 11px 1.5px, 1
 
         var hasTopics = r.topics && r.topics.length;
         var placeHit = D.places.filter(function (p) { return p.name === r.title; })[0];
-        if (hasTopics || r.memo || placeHit || (r.info && r.info.length)) {
-          var prog = el('div', 'program');
+        var hasInfo = r.info && r.info.length;
+        if (hasInfo || hasTopics || placeHit) {
+          var idet = foldRow('fold-row record-row', '박물관 정보', hasInfo ? r.info.length + '가지' : '');
+          var ib = el('div', 'fold-body');
+          if (hasInfo) {
+            var iul = el('ul', 'place-extra');
+            r.info.forEach(function (x) { iul.appendChild(el('li', '', x)); });
+            ib.appendChild(iul);
+          }
           if (hasTopics || placeHit) {
             var rblock = el('div', 'related-block');
             rblock.appendChild(el('span', 'related-label', '함께 보기'));
@@ -1685,32 +1679,18 @@ details[open] > summary::after { transform: none; background-size: 11px 1.5px, 1
             });
             if (placeHit) rlist.appendChild(createLink('가볼 곳에서 보기', 'place', placeHit.name));
             rblock.appendChild(rlist);
-            prog.appendChild(rblock);
+            ib.appendChild(rblock);
           }
-          if (prog.childNodes.length) card.appendChild(prog);
-          if (r.info && r.info.length) {
-            var idet = foldRow('fold-row record-row', '박물관 정보', r.info.length + '가지');
-            var ib = el('div', 'fold-body');
-            var iul = el('ul', 'place-extra');
-            r.info.forEach(function (x) { iul.appendChild(el('li', '', x)); });
-            ib.appendChild(iul);
-            idet.appendChild(ib);
-            card.appendChild(idet);
-          }
-          if (r.memo) {
-            var det = foldRow('fold-row record-row', '메모');
-            var mb = el('div', 'fold-body');
-            mb.appendChild(el('p', 'memo-text', r.memo));
-            det.appendChild(mb);
-            card.appendChild(det);
-          }
+          idet.appendChild(ib);
+          card.appendChild(idet);
         }
-        var actions = el('div', 'record-actions');
-        var edit = el('button', '', '수정');
-        edit.type = 'button';
-        edit.setAttribute('data-edit', r.id);
-        actions.appendChild(edit);
-        card.appendChild(actions);
+        if (r.memo) {
+          var det = foldRow('fold-row record-row', '메모');
+          var mb = el('div', 'fold-body');
+          mb.appendChild(el('p', 'memo-text', r.memo));
+          det.appendChild(mb);
+          card.appendChild(det);
+        }
         recordsPanel.insertBefore(card, emptyBox);
       });
 
@@ -1723,7 +1703,6 @@ details[open] > summary::after { transform: none; background-size: 11px 1.5px, 1
       $('add-record').hidden = picks;
       if (!shown.length) {
         emptyBox.querySelector('strong').textContent = !records.length ? '기록한 방문이 아직 없음' : filter === 'upcoming' ? '예정된 방문이 없음' : '방문 완료 기록이 아직 없음';
-        $('empty-copy').textContent = !records.length ? '방문 추가를 눌러 박물관과 유적지를 기록하세요.' : '';
       }
       updatePlaceStates();
     }
@@ -1920,13 +1899,6 @@ details[open] > summary::after { transform: none; background-size: 11px 1.5px, 1
     });
 
     $('add-record').addEventListener('click', function () { openSheet(null); });
-    recordsPanel.addEventListener('click', function (event) {
-      var edit = event.target.closest('[data-edit]');
-      if (!edit) return;
-      var id = edit.getAttribute('data-edit');
-      var rec = records.filter(function (r) { return r.id === id; })[0];
-      if (rec) openSheet(rec);
-    });
     $('sheet-close').addEventListener('click', closeSheet);
     backdrop.addEventListener('click', closeSheet);
     document.addEventListener('keydown', function (event) { if (event.key === 'Escape' && !sheet.hidden) closeSheet(); });
@@ -1960,7 +1932,7 @@ details[open] > summary::after { transform: none; background-size: 11px 1.5px, 1
       showToast('방문을 삭제함');
     });
     window.setInterval(renderRecords, 60000);
-    showScreen('visits');
+    showScreen(savedTabs.screen);
   }());
   </script>
 </body>
