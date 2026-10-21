@@ -815,7 +815,7 @@ details[open] > summary { box-shadow: inset 0 -1px 0 var(--line); }
   bottom: 0;
   z-index: 10;
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(5, minmax(0, 1fr));
   width: min(100%, 560px);
   transform: translateX(-50%);
   padding-bottom: env(safe-area-inset-bottom, 0px);
@@ -975,14 +975,13 @@ details[open] > summary::after { transform: none; background-size: 11px 1.5px, 1
       </section>
     </section>
 
-    <section class="view-panel" id="study-view" role="tabpanel" aria-labelledby="tab-eras" hidden>
+    <section class="view-panel" id="study-view" role="tabpanel" aria-labelledby="tab-korea" hidden>
       <div class="study-search-wrap">
         <input class="study-search" id="study-search" type="search" inputmode="search" autocomplete="off" aria-label="시대, 사건, 연표, 사전, 박물관과 유적지 통합 검색" aria-controls="study-search-results" aria-expanded="false" placeholder="역사 공부 전체 검색">
         <div class="search-results" id="study-search-results" role="listbox" hidden></div>
       </div>
 
       <section class="study-panel" id="study-eras" data-study-panel="eras">
-        <nav class="era-tabs" id="region-tabs" aria-label="한국사와 세계사 선택"></nav>
         <nav class="term-filters card-tabs" id="era-picker" aria-label="시대 선택"></nav>
         <div class="era-overviews" id="era-overviews"></div>
       </section>
@@ -1001,9 +1000,10 @@ details[open] > summary::after { transform: none; background-size: 11px 1.5px, 1
   </main>
 
   <nav class="bottom-tabs" aria-label="역사 메뉴" role="tablist">
-    <button class="bottom-tab" id="tab-visits" type="button" role="tab" aria-controls="visit-view" aria-selected="true" data-screen="visits"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 10l9-5 9 5"/><path d="M5 10v8M9.5 10v8M14.5 10v8M19 10v8"/><path d="M3 20h18"/></svg><span>방문 기록</span></button>
-    <button class="bottom-tab" id="tab-eras" type="button" role="tab" aria-controls="study-view" aria-selected="false" data-screen="eras"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 3h10M7 21h10"/><path d="M8 3c0 5 8 5 8 9s-8 4-8 9M16 3c0 5-8 5-8 9s8 4 8 9"/></svg><span>시대·사건</span></button>
-    <button class="bottom-tab" id="tab-timeline" type="button" role="tab" aria-controls="study-view" aria-selected="false" data-screen="timeline"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 4v16"/><circle cx="6" cy="7" r="1.6"/><circle cx="6" cy="17" r="1.6"/><path d="M10 7h9M10 12h6M10 17h9"/></svg><span>연표</span></button>
+    <button class="bottom-tab" id="tab-visits" type="button" role="tab" aria-controls="visit-view" aria-selected="true" data-screen="visits"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 10l9-5 9 5"/><path d="M5 10v8M9.5 10v8M14.5 10v8M19 10v8"/><path d="M3 20h18"/></svg><span>기록</span></button>
+    <button class="bottom-tab" id="tab-korea" type="button" role="tab" aria-controls="study-view" aria-selected="false" data-screen="korea"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8"/><path d="M4 12a4 4 0 0 1 8 0 4 4 0 0 0 8 0"/></svg><span>한국사</span></button>
+    <button class="bottom-tab" id="tab-world" type="button" role="tab" aria-controls="study-view" aria-selected="false" data-screen="world"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8"/><path d="M4 12h16"/><path d="M12 4c2.6 2.4 2.6 13.6 0 16M12 4c-2.6 2.4-2.6 13.6 0 16"/></svg><span>세계사</span></button>
+    <button class="bottom-tab" id="tab-timeline" type="button" role="tab" aria-controls="study-view" aria-selected="false" data-screen="timeline"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 4v16"/><circle cx="6" cy="7" r="1.6"/><circle cx="6" cy="17" r="1.6"/><path d="M10 7h9M10 12h6M10 17h9"/></svg><span>연대기</span></button>
     <button class="bottom-tab" id="tab-dictionary" type="button" role="tab" aria-controls="study-view" aria-selected="false" data-screen="dictionary"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 6.5C10.5 5.3 8.3 4.8 5 5v13c3.3-.2 5.5.3 7 1.5 1.5-1.2 3.7-1.7 7-1.5V5c-3.3-.2-5.5.3-7 1.5z"/><path d="M12 6.5v13"/></svg><span>사전</span></button>
   </nav>
 
@@ -1214,15 +1214,6 @@ details[open] > summary::after { transform: none; background-size: 11px 1.5px, 1
         picker.appendChild(t);
       });
 
-      var tabs = $('region-tabs');
-      eraRegions.forEach(function (r) {
-        var b = el('button', 'era-tab', r);
-        b.type = 'button';
-        b.setAttribute('aria-pressed', r === activeRegion ? 'true' : 'false');
-        b.setAttribute('data-region-jump', r);
-        tabs.appendChild(b);
-      });
-
       D.events.forEach(function (ev) {
         var card = foldRow('fold-row composer-card', ev.title, null, ev.when.split(' · ')[0]);
         card.id = ev.id;
@@ -1384,7 +1375,7 @@ details[open] > summary::after { transform: none; background-size: 11px 1.5px, 1
     function setRegion(r) {
       activeRegion = r;
       saveTab('region', r);
-      qsa('#region-tabs .era-tab').forEach(function (b) { b.setAttribute('aria-pressed', b.getAttribute('data-region-jump') === r ? 'true' : 'false'); });
+      if (!studyView.hidden && SCREENS.indexOf(currentScreen) !== -1 && REGION_OF[currentScreen] && REGION_OF[currentScreen] !== r) markScreen(SCREEN_OF[r]);
       qsa('#era-picker .term-filter').forEach(function (b) { b.hidden = b.getAttribute('data-region') !== r; });
       setEra(savedEra(r));
     }
@@ -1409,18 +1400,29 @@ details[open] > summary::after { transform: none; background-size: 11px 1.5px, 1
     }
 
     /* ---------- study: navigation ---------- */
-    var SCREENS = ['visits', 'eras', 'timeline', 'dictionary'];
-    function showScreen(name) {
-      if (SCREENS.indexOf(name) === -1) name = 'visits';
+    /* 한국사·세계사 탭은 같은 시대 화면을 지역만 바꿔 보여 준다 */
+    var SCREENS = ['visits', 'korea', 'world', 'timeline', 'dictionary'];
+    var REGION_OF = { korea: '한국사', world: '세계사' };
+    var SCREEN_OF = { '한국사': 'korea', '세계사': 'world' };
+    var currentScreen = 'visits';
+    function markScreen(name) {
+      currentScreen = name;
       saveTab('screen', name);
       bottomTabs.forEach(function (tab) {
         var sel = tab.getAttribute('data-screen') === name;
         tab.setAttribute('aria-selected', sel ? 'true' : 'false');
         tab.tabIndex = sel ? 0 : -1;
       });
+    }
+    function showScreen(name) {
+      if (name === 'eras') name = SCREEN_OF[activeRegion] || 'korea';
+      if (SCREENS.indexOf(name) === -1) name = 'visits';
+      markScreen(name);
+      var panel = REGION_OF[name] ? 'eras' : name;
       visitView.hidden = name !== 'visits';
       studyView.hidden = name === 'visits';
-      studyPanels.forEach(function (p) { p.hidden = p.getAttribute('data-study-panel') !== name; });
+      studyPanels.forEach(function (p) { p.hidden = p.getAttribute('data-study-panel') !== panel; });
+      if (REGION_OF[name] && activeRegion !== REGION_OF[name]) setRegion(REGION_OF[name]);
       window.scrollTo(0, 0);
     }
     function activateStudySection(section) {
@@ -1857,9 +1859,6 @@ details[open] > summary::after { transform: none; background-size: 11px 1.5px, 1
     });
     qsa('#place-filters .term-filter').forEach(function (b) {
       b.addEventListener('click', function () { selectPlaceGroup(b.getAttribute('data-place-group')); });
-    });
-    qsa('#region-tabs .era-tab').forEach(function (b) {
-      b.addEventListener('click', function () { setRegion(b.getAttribute('data-region-jump')); });
     });
     qsa('#era-picker .term-filter').forEach(function (b) {
       b.addEventListener('click', function () { setEra(b.getAttribute('data-era-jump')); });
