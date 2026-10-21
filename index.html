@@ -862,7 +862,7 @@ details[open] > summary { box-shadow: inset 0 -1px 0 var(--line); }
 .timeline-list,
 .empty { overflow: clip; border: 1px solid var(--line); border-radius: var(--radius); background: var(--card); }
 .fold-head { padding: var(--pad); border-bottom: 1px solid var(--line); }
-.fold-title { display: flex; align-items: baseline; gap: 10px; }
+.fold-title { display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px 10px; }
 .fold-title h3 { min-width: 0; margin: 0; font-size: var(--fs-xl); font-weight: 700; line-height: 1.3; }
 .card-badge {
   flex: 0 0 auto;
@@ -892,11 +892,11 @@ summary::after {
 details[open] > summary::after { transform: none; background-size: 11px 1.5px, 1.5px 0; }
 
 .fold-row { border-top: 1px solid var(--line); scroll-margin-top: var(--stick); }
+.fold-card { scroll-margin-top: var(--stick); }
 .fold-head + .fold-row,
 .record-top + .fold-row,
 .record-top + .record-actions { border-top: 0; }
-.fold-row > summary,
-.inner-row > summary {
+.fold-row > summary {
   display: flex;
   min-height: var(--row);
   align-items: center;
@@ -925,20 +925,8 @@ details[open] > summary::after { transform: none; background-size: 11px 1.5px, 1
 .fold-body .place-add { margin-top: 20px; }
 .fold-body .memo-text { padding: 0; color: var(--text); }
 .fold-body .place-extra { margin: 0; }
-
-/* 안쪽 줄: 카드 폭 전체로 깔되 글은 제자리. 막대는 바깥 막대를 다시 그릴 뿐 따로 두지 않는다 */
-.inner-list { margin: 16px calc(-1 * var(--pad)) calc(-1 * var(--pad)); border-top: 1px solid var(--line); }
-.inner-row { scroll-margin-top: calc(var(--stick) + var(--row)); }
-.inner-row > summary { min-height: var(--row); padding: 12px var(--pad); }
-.inner-row[open] > summary {
-  position: sticky;
-  top: calc(var(--stick) + var(--row));
-  z-index: 2;
-  background: var(--summary);
-  box-shadow: inset 3px 0 0 var(--accent), 0 1px 0 var(--line);
-}
-.inner-row > .inner-body { padding: 14px var(--pad) 16px; }
-.inner-body > .composer-detail-name { margin: 0 0 8px; padding: 0; }
+.fold-body > .composer-detail-name { margin: 0 0 8px; padding: 0; }
+.fold-card > .era-notes { margin-top: 0; }
 
 .record-top { padding: var(--pad); }
 .record h3 { font-size: var(--fs-xl); line-height: 1.3; }
@@ -999,7 +987,8 @@ details[open] > summary::after { transform: none; background-size: 11px 1.5px, 1
       </div>
 
       <section class="study-panel" id="study-eras" data-study-panel="eras">
-        <nav class="era-tabs card-tabs" id="region-tabs" aria-label="한국사와 세계사 선택"></nav>
+        <nav class="era-tabs" id="region-tabs" aria-label="한국사와 세계사 선택"></nav>
+        <nav class="term-filters card-tabs" id="era-picker" aria-label="시대 선택"></nav>
         <div class="era-overviews" id="era-overviews"></div>
       </section>
 
@@ -1113,6 +1102,9 @@ details[open] > summary::after { transform: none; background-size: 11px 1.5px, 1
     var activeTermCategory = pick(termCategories, savedTabs.term);
     var activePlaceGroup = pick(placeGroups, savedTabs.place);
     var activeRegion = pick(eraRegions, savedTabs.region);
+    function erasOf(r) { return D.eras.filter(function (e) { return e.region === r; }).map(function (e) { return e.name; }); }
+    function savedEra(r) { return pick(erasOf(r), savedTabs['era:' + r]); }
+    var activeEra = savedEra(activeRegion);
     var eraIndex = {};
     D.eras.forEach(function (e, i) { eraIndex[e.name] = i + 1; });
 
@@ -1183,28 +1175,19 @@ details[open] > summary::after { transform: none; background-size: 11px 1.5px, 1
 
     function renderEras() {
       var holder = $('era-overviews');
-      eraRegions.forEach(function (r) {
-        var eras = D.eras.filter(function (e) { return e.region === r; });
-        var count = D.events.filter(function (ev) { return ev.era.split(' · ')[0] === r; }).length;
-        var regionCard = foldCard(r, '시대 ' + eras.length + '개', '시대 ' + eras.length + '개와 사건 ' + count + '개를 시대 순서로 정리함');
-        regionCard.setAttribute('data-region-card', r);
-        regionCard.hidden = r !== activeRegion;
-        holder.appendChild(regionCard);
-      });
+      var picker = $('era-picker');
       D.eras.forEach(function (era, i) {
-        var n = D.events.filter(function (ev) { return ev.era === era.name; }).length;
-        var group = foldRow('fold-row era-row', era.name.split(' · ')[1], '사건 ' + n + '개');
+        var short = era.name.split(' · ')[1];
+        var group = foldCard(short, era.years, era.summary);
         group.id = 'era-' + (i + 1);
+        group.tabIndex = -1;
         group.setAttribute('data-era-card', era.name);
+        group.setAttribute('data-era-events', era.name);
         group.setAttribute('data-region', era.region);
+        group.hidden = era.name !== activeEra;
 
-        var desc = el('div', 'fold-body');
-        desc.appendChild(el('p', 'fold-years', era.years));
-        desc.appendChild(el('p', '', era.summary));
-        var list = el('div', 'inner-list');
-        list.setAttribute('data-era-events', era.name);
-        var notes = foldRow('inner-row era-notes', '시대 특징', era.points.length + '가지');
-        var nb = el('div', 'inner-body study-card-body');
+        var notes = foldRow('fold-row era-notes', '시대 특징', era.points.length + '가지');
+        var nb = el('div', 'fold-body study-card-body');
         appendList(nb, era.points);
         if (era.people) {
           var pr = el('p', 'era-line');
@@ -1226,10 +1209,16 @@ details[open] > summary::after { transform: none; background-size: 11px 1.5px, 1
         words.appendChild(wl);
         nb.appendChild(words);
         notes.appendChild(nb);
-        list.appendChild(notes);
-        desc.appendChild(list);
-        group.appendChild(desc);
-        qsa('[data-region-card]', holder).filter(function (c) { return c.getAttribute('data-region-card') === era.region; })[0].appendChild(group);
+        group.appendChild(notes);
+        holder.appendChild(group);
+
+        var t = el('button', 'term-filter', short);
+        t.type = 'button';
+        t.hidden = era.region !== activeRegion;
+        t.setAttribute('aria-pressed', era.name === activeEra ? 'true' : 'false');
+        t.setAttribute('data-era-jump', era.name);
+        t.setAttribute('data-region', era.region);
+        picker.appendChild(t);
       });
 
       var tabs = $('region-tabs');
@@ -1242,11 +1231,11 @@ details[open] > summary::after { transform: none; background-size: 11px 1.5px, 1
       });
 
       D.events.forEach(function (ev) {
-        var card = foldRow('inner-row composer-card', ev.title, null, ev.when.split(' · ')[0]);
+        var card = foldRow('fold-row composer-card', ev.title, null, ev.when.split(' · ')[0]);
         card.id = ev.id;
         card.setAttribute('data-event-card', ev.title);
 
-        var body = el('div', 'inner-body study-card-body');
+        var body = el('div', 'fold-body study-card-body');
         body.appendChild(el('p', 'composer-detail-name', ev.when));
         body.appendChild(el('p', 'event-sum', ev.sum));
         body.appendChild(el('h4', '', '배경'));
@@ -1403,7 +1392,27 @@ details[open] > summary::after { transform: none; background-size: 11px 1.5px, 1
       activeRegion = r;
       saveTab('region', r);
       qsa('#region-tabs .era-tab').forEach(function (b) { b.setAttribute('aria-pressed', b.getAttribute('data-region-jump') === r ? 'true' : 'false'); });
-      qsa('[data-region-card]').forEach(function (g) { g.hidden = g.getAttribute('data-region-card') !== r; });
+      qsa('#era-picker .term-filter').forEach(function (b) { b.hidden = b.getAttribute('data-region') !== r; });
+      setEra(savedEra(r));
+    }
+    /* 시대 탭: 고른 시대 카드 하나만 보인다. 탭 줄이 위에 붙어 있으면 카드 맨 위로 올린다 */
+    function setEra(name) {
+      if (!eraByName[name]) return;
+      activeEra = name;
+      saveTab('era:' + eraByName[name].region, name);
+      var tab = null;
+      qsa('#era-picker .term-filter').forEach(function (b) {
+        var sel = b.getAttribute('data-era-jump') === name;
+        b.setAttribute('aria-pressed', sel ? 'true' : 'false');
+        if (sel) tab = b;
+      });
+      var card = null;
+      qsa('[data-era-card]').forEach(function (g) {
+        g.hidden = g.getAttribute('data-era-card') !== name;
+        if (!g.hidden) card = g;
+      });
+      if (tab) tab.scrollIntoView({ block: 'nearest', inline: 'nearest' });
+      if (card && card.getBoundingClientRect().top < 60) card.scrollIntoView({ block: 'start' });
     }
 
     /* ---------- study: navigation ---------- */
@@ -1468,17 +1477,15 @@ details[open] > summary::after { transform: none; background-size: 11px 1.5px, 1
         activateStudySection('eras');
         var card = $(ev.id);
         qsa('.composer-card[open], .era-notes[open]').forEach(function (c) { if (c !== card) c.open = false; });
-        qsa('.era-row[open]').forEach(function (c) { if (c.getAttribute('data-era-card') !== ev.era) c.open = false; });
-        setRegion(ev.era.split(' · ')[0]);
-        var group = qsa('[data-era-card]').filter(function (g) { return g.getAttribute('data-era-card') === ev.era; })[0];
-        if (group) group.open = true;
+        if (eraByName[ev.era]) setRegion(eraByName[ev.era].region);
+        setEra(ev.era);
         reveal(card);
         return;
       }
       if (kind === 'era') {
         activateStudySection('eras');
         if (eraByName[value]) setRegion(eraByName[value].region);
-        qsa('.era-row[open]').forEach(function (c) { if (c.getAttribute('data-era-card') !== value) c.open = false; });
+        setEra(value);
         reveal(qsa('[data-era-card]').filter(function (c) { return c.getAttribute('data-era-card') === value; })[0]);
         return;
       }
@@ -1874,6 +1881,9 @@ details[open] > summary::after { transform: none; background-size: 11px 1.5px, 1
     });
     qsa('#region-tabs .era-tab').forEach(function (b) {
       b.addEventListener('click', function () { setRegion(b.getAttribute('data-region-jump')); });
+    });
+    qsa('#era-picker .term-filter').forEach(function (b) {
+      b.addEventListener('click', function () { setEra(b.getAttribute('data-era-jump')); });
     });
     qsa('#timeline-filters .term-filter').forEach(function (b) {
       b.addEventListener('click', function () { timelineFilter = b.getAttribute('data-timeline-filter'); applyTimelineFilter(); });
