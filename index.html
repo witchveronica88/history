@@ -63,14 +63,12 @@
 * { box-sizing: border-box; }
 html {
   scroll-behavior: smooth;
-  overscroll-behavior: none;
   background: var(--bg);
 }
 body {
   margin: 0;
   min-width: 0;
   overflow-wrap: break-word;
-  overscroll-behavior: none;
   background: var(--bg);
   color: var(--text);
   font-family: Pretendard, "Apple SD Gothic Neo", "Noto Sans KR", sans-serif;
@@ -728,7 +726,6 @@ details:not([open]) > :not(summary) { display: none; }
 .era-notes > summary, .record-memo > summary { padding: 12px 14px; border-radius: 8px; box-shadow: none; }
 .era-notes[open] > summary, .record-memo[open] > summary { margin-bottom: 16px; }
 .era-notes-body { padding: 0 0 4px; }
-.era-line { margin: 16px 0 0; }
 details > summary { background: var(--summary); }
 details[open] > summary { box-shadow: inset 0 -1px 0 var(--line); }
 .era-fold > summary, .nested-composer > summary { min-height: 52px; padding: 14px 16px; }
@@ -757,8 +754,9 @@ details[open] > summary { box-shadow: inset 0 -1px 0 var(--line); }
 .study-count { margin: 0 0 12px; }
 
 .timeline-tag { color: var(--muted); }
-.era-line { color: var(--muted); font-size: var(--fs-m); }
-.era-line strong { color: var(--text); }
+.fold-body > .era-people { margin-top: 16px; }
+.era-people + .era-genres { margin-top: 8px; }
+.people-text { flex: 1 1 0; min-width: 0; font-size: var(--fs-s); line-height: 1.6; }
 .event-sum { font-weight: 700; }
 .place-list { margin: 0; }
 .study-tabs { gap: 20px; }
@@ -900,7 +898,22 @@ details[open] > summary::after { transform: none; background-size: 11px 1.5px, 1
 .fold-body .term-definition { color: var(--text); }
 .fold-body .memo-text { padding: 0; color: var(--text); }
 .fold-body .place-extra { margin: 0; }
-.fold-body .place-extra + .related-block { margin-top: 16px; }
+/* 박물관 정보: 왼쪽 목차, 오른쪽 내용. 함께 보기도 같은 칸에 맞춰 마지막 줄로 */
+.info-table { margin: 0; }
+.info-row,
+.info-table + .related-block {
+  display: grid;
+  grid-template-columns: 5em minmax(0, 1fr);
+  gap: 12px;
+  align-items: baseline;
+  margin: 0;
+  padding: 10px 0;
+  border-top: 1px solid var(--line);
+}
+.info-row:first-child { padding-top: 0; border-top: 0; }
+.info-table + .related-block { padding-bottom: 0; }
+.info-row dt { color: var(--muted); font-size: var(--fs-s); }
+.info-row dd { margin: 0; }
 .fold-body > .composer-detail-name { margin: 0 0 8px; padding: 0; }
 .fold-card > .era-notes { margin-top: 0; }
 
@@ -997,7 +1010,14 @@ details[open] > summary::after { transform: none; background-size: 11px 1.5px, 1
   (function () {
     var D = window.HIST_DATA;
     var STORE_KEY = 'history-visits-v1';
-    var SEED_INFO = ['공식 이름: 다구문물관(Flagstaff House Museum of Tea Ware). 홍콩 미술관의 분관', '위치: 홍콩공원 안, 10 Cotton Tree Drive, Central', '건물: 1846년 완공한 그리스 부흥 양식 건물. 1978년까지 영국군 사령관의 관저와 사무실로 쓰임. 1989년 법정 기념물로 지정됨', '개관: 1984년. K.S. 로 박사가 기증한 차 도구 약 600점이 소장품의 바탕', '운영: 월·수–일 10:00–18:00, 화요일 휴관, 입장 무료', '확인: 운영 여부는 hk.art.museum에서 확인'];
+    var SEED_INFO = [
+      ['공식 이름', '다구문물관(Flagstaff House Museum of Tea Ware). 홍콩 미술관의 분관'],
+      ['위치', '홍콩공원 안, 10 Cotton Tree Drive, Central'],
+      ['건물', '1846년 완공한 그리스 부흥 양식 건물. 1978년까지 영국군 사령관의 관저와 사무실로 쓰임. 1989년 법정 기념물로 지정됨'],
+      ['개관', '1984년. K.S. 로 박사가 기증한 차 도구 약 600점이 소장품의 바탕'],
+      ['운영', '월·수–일 10:00–18:00, 화요일 휴관, 입장 무료'],
+      ['누리집', 'hk.art.museum']
+    ];
     function $(id) { return document.getElementById(id); }
     function el(tag, cls, text) {
       var n = document.createElement(tag);
@@ -1047,8 +1067,18 @@ details[open] > summary::after { transform: none; background-size: 11px 1.5px, 1
     var activeTermCategory = pick(termCategories, savedTabs.term);
     var activePlaceGroup = pick(placeGroups, savedTabs.place);
     var activeRegion = pick(eraRegions, savedTabs.region);
-    function erasOf(r) { return D.eras.filter(function (e) { return e.region === r; }).map(function (e) { return e.name; }); }
-    function savedEra(r) { return pick(erasOf(r), savedTabs['era:' + r]); }
+    /* 내용이 적은 시대는 탭 하나에 카드 여럿으로 묶는다 */
+    var ERA_TAB = { '한국사 · 조선 전기': '조선', '한국사 · 조선 후기': '조선' };
+    function tabKey(name) { return eraByName[name].region + ' · ' + (ERA_TAB[name] || name.split(' · ')[1]); }
+    function tabsOf(r) {
+      var a = [];
+      D.eras.forEach(function (e) { if (e.region === r && a.indexOf(tabKey(e.name)) === -1) a.push(tabKey(e.name)); });
+      return a;
+    }
+    function savedEra(r) {
+      var saved = savedTabs['era:' + r];
+      return pick(tabsOf(r), eraByName[saved] ? tabKey(saved) : saved);
+    }
     var activeEra = savedEra(activeRegion);
     var eraIndex = {};
     D.eras.forEach(function (e, i) { eraIndex[e.name] = i + 1; });
@@ -1129,15 +1159,16 @@ details[open] > summary::after { transform: none; background-size: 11px 1.5px, 1
         group.setAttribute('data-era-card', era.name);
         group.setAttribute('data-era-events', era.name);
         group.setAttribute('data-region', era.region);
-        group.hidden = era.name !== activeEra;
+        group.setAttribute('data-era-tab', tabKey(era.name));
+        group.hidden = tabKey(era.name) !== activeEra;
 
         var notes = foldRow('fold-row era-notes', '시대 특징', era.points.length + '가지');
         var nb = el('div', 'fold-body study-card-body');
         appendList(nb, era.points);
         if (era.people) {
-          var pr = el('p', 'era-line');
-          pr.appendChild(el('strong', '', '핵심 인물 '));
-          pr.appendChild(document.createTextNode(era.people));
+          var pr = el('div', 'related-block era-people');
+          pr.appendChild(el('span', 'related-label', '핵심 인물'));
+          pr.appendChild(el('span', 'people-text', era.people));
           nb.appendChild(pr);
         }
         var words = el('div', 'related-block era-genres');
@@ -1157,11 +1188,13 @@ details[open] > summary::after { transform: none; background-size: 11px 1.5px, 1
         group.appendChild(notes);
         holder.appendChild(group);
 
-        var t = el('button', 'term-filter', short);
+        var key = tabKey(era.name);
+        if (picker.querySelector('[data-era-jump="' + key + '"]')) return;
+        var t = el('button', 'term-filter', key.split(' · ')[1]);
         t.type = 'button';
         t.hidden = era.region !== activeRegion;
-        t.setAttribute('aria-pressed', era.name === activeEra ? 'true' : 'false');
-        t.setAttribute('data-era-jump', era.name);
+        t.setAttribute('aria-pressed', key === activeEra ? 'true' : 'false');
+        t.setAttribute('data-era-jump', key);
         t.setAttribute('data-region', era.region);
         picker.appendChild(t);
       });
@@ -1327,21 +1360,24 @@ details[open] > summary::after { transform: none; background-size: 11px 1.5px, 1
       qsa('#era-picker .term-filter').forEach(function (b) { b.hidden = b.getAttribute('data-region') !== r; });
       setEra(savedEra(r));
     }
-    /* 시대 탭: 고른 시대 카드 하나만 보인다. 탭 줄이 위에 붙어 있으면 카드 맨 위로 올린다 */
+    /* 시대 탭: 고른 탭의 시대 카드만 보인다(조선은 전기·후기 두 장). 탭 줄이 위에 붙어 있으면 카드 맨 위로 올린다.
+       시대 이름이나 탭 이름(지역 · 탭)을 받는다 */
     function setEra(name) {
-      if (!eraByName[name]) return;
-      activeEra = name;
-      saveTab('era:' + eraByName[name].region, name);
+      var key = eraByName[name] ? tabKey(name) : name;
+      var region = String(key).split(' · ')[0];
+      if (tabsOf(region).indexOf(key) === -1) return;
+      activeEra = key;
+      saveTab('era:' + region, key);
       var tab = null;
       qsa('#era-picker .term-filter').forEach(function (b) {
-        var sel = b.getAttribute('data-era-jump') === name;
+        var sel = b.getAttribute('data-era-jump') === key;
         b.setAttribute('aria-pressed', sel ? 'true' : 'false');
         if (sel) tab = b;
       });
       var card = null;
       qsa('[data-era-card]').forEach(function (g) {
-        g.hidden = g.getAttribute('data-era-card') !== name;
-        if (!g.hidden) card = g;
+        g.hidden = g.getAttribute('data-era-tab') !== key;
+        if (!g.hidden && !card) card = g;
       });
       if (tab) tab.scrollIntoView({ block: 'nearest', inline: 'nearest' });
       if (card && card.getBoundingClientRect().top < 60) card.scrollIntoView({ block: 'start' });
@@ -1655,9 +1691,14 @@ details[open] > summary::after { transform: none; background-size: 11px 1.5px, 1
           var idet = foldRow('fold-row record-row', '박물관 정보', hasInfo ? r.info.length + '가지' : '');
           var ib = el('div', 'fold-body');
           if (hasInfo) {
-            var iul = el('ul', 'place-extra');
-            r.info.forEach(function (x) { iul.appendChild(el('li', '', x)); });
-            ib.appendChild(iul);
+            var table = el('dl', 'info-table');
+            r.info.forEach(function (x) {
+              var row = el('div', 'info-row');
+              row.appendChild(el('dt', '', x[0]));
+              row.appendChild(el('dd', '', x[1]));
+              table.appendChild(row);
+            });
+            ib.appendChild(table);
           }
           if (hasTopics || placeHit) {
             var rblock = el('div', 'related-block');
