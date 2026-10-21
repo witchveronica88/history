@@ -914,6 +914,26 @@ details[open] > summary::after { transform: none; background-size: 11px 1.5px, 1
 .info-table + .related-block { padding-bottom: 0; }
 .info-row dt { color: var(--muted); font-size: var(--fs-s); }
 .info-row dd { margin: 0; }
+/* 한 단계 안쪽 ＋ 줄(대표 작품): 접힌 줄은 내용 폭, 펼친 제목 줄 배경은 카드 폭 전체로 깔고 바깥 막대를 다시 그린다.
+   펼친 내용은 왼쪽 회색 안내선과 함께 14px 들여 쓴다 */
+.inner-list { padding-top: 0; padding-bottom: 8px; }
+.inner-row { border-top: 1px solid var(--line); scroll-margin-top: calc(var(--stick) + var(--row)); }
+.inner-row:first-child { border-top: 0; }
+.inner-row > summary { display: flex; min-height: var(--row); align-items: center; gap: 12px; padding: 14px 0; }
+.inner-row[open] > summary {
+  position: sticky;
+  top: calc(var(--stick) + var(--row));
+  z-index: 2;
+  margin: 0 calc(-1 * var(--pad));
+  padding-right: var(--pad);
+  padding-left: var(--pad);
+  background: var(--summary);
+  box-shadow: inset 3px 0 0 var(--accent), 0 1px 0 var(--line);
+}
+.inner-body { margin: 14px 0 16px; padding-left: 14px; border-left: 2px solid var(--line); }
+.inner-body > p { margin: 0; }
+.inner-body > p + p { margin-top: 6px; }
+.inner-body .inner-meta { color: var(--muted); font-size: var(--fs-s); }
 .fold-body > .composer-detail-name { margin: 0 0 8px; padding: 0; }
 .fold-card > .era-notes { margin-top: 0; }
 
@@ -1010,14 +1030,36 @@ details[open] > summary::after { transform: none; background-size: 11px 1.5px, 1
   (function () {
     var D = window.HIST_DATA;
     var STORE_KEY = 'history-visits-v1';
-    var SEED_INFO = [
-      ['공식 이름', '다구문물관(Flagstaff House Museum of Tea Ware). 홍콩 미술관의 분관'],
-      ['위치', '홍콩공원 안, 10 Cotton Tree Drive, Central'],
-      ['건물', '1846년 완공한 그리스 부흥 양식 건물. 1978년까지 영국군 사령관의 관저와 사무실로 쓰임. 1989년 법정 기념물로 지정됨'],
-      ['개관', '1984년. K.S. 로 박사가 기증한 차 도구 약 600점이 소장품의 바탕'],
-      ['운영', '월·수–일 10:00–18:00, 화요일 휴관, 입장 무료'],
-      ['누리집', 'hk.art.museum']
+    /* 박물관 정보의 원본. 칸 이름과 순서는 MUSEUM_FIELDS로 고정하고, 확인 못 한 칸은 비운다(화면에서 빠짐).
+       방문 기록은 museum 칸에 이 id를 적어 가리킨다. 규칙은 CLAUDE.md '박물관 정보' */
+    var MUSEUM_FIELDS = [
+      ['name', '공식 이름'], ['kind', '성격'], ['where', '위치'], ['way', '가는 길'],
+      ['building', '건물'], ['history', '역사'], ['collection', '소장품'],
+      ['hours', '운영'], ['fee', '입장료'], ['web', '누리집'], ['checked', '확인']
     ];
+    var MUSEUMS = {
+      'hk-tea-ware': {
+        name: '다구문물관(Flagstaff House Museum of Tea Ware). 홍콩 미술관 분관',
+        kind: '차 도구를 전문으로 모으고 연구·전시하는 세계 첫 박물관',
+        where: '홍콩공원 안, 10 Cotton Tree Drive, Central',
+        way: 'MTR 애드미럴티역 C1 출구에서 걸어서 약 10분',
+        building: '플래그스태프 하우스. 1844–1846년에 지은 그리스 부흥 양식 건물로, 홍콩에 남은 가장 오래된 서양식 건물. 1978년까지 영국군 사령관 관저. 1989년 법정 기념물 지정',
+        history: '1984년 개관. 1981년 K.S. 로 박사가 차 도구를 기증한 것이 바탕. 1994년 K.S. 로 재단이 도자기 25점과 인장 600여 점을 더 기증해 K.S. 로 전시관이 생김',
+        collection: '서주(기원전 11세기)부터 20세기까지의 차 도구와 관련 그릇 약 600점. 절반은 자기 차 도구, 나머지는 의흥 자사 차 도구·조각·문방구',
+        hours: '월·수–일 10:00–18:00. 화요일 휴관(공휴일이면 엶), 음력 설 첫 이틀 휴관. 크리스마스이브·음력 섣달그믐은 17:00까지',
+        fee: '무료',
+        web: 'hk.art.museum',
+        checked: '2026.10.21 공식 누리집',
+        works: [
+          { name: '요주요 모란무늬 주자', when: '11세기', era: '북송', kind: '요주요 석기, 올리브빛 녹유', maker: '', about: '모란 가지를 새긴 주전자. 길게 굽은 부리는 가루차를 휘저어 거품 내 마시던 송나라 방식에 맞춘 모양' },
+          { name: '건요 토호 찻사발', when: '12–13세기', era: '남송', kind: '건요 자기, 검은 유약', maker: '', about: '검은 유약에 토끼털 같은 가는 줄무늬(토호)가 흐르는 찻사발. 송나라 사람들이 차 맛과 거품을 겨루던 투다(鬪茶)에 썼음' },
+          { name: '진용경 큰 차호', when: '1620년대', era: '명 말', kind: '의흥 자사(짙은 갈색 석기)', maker: '진용경 서명', about: '뚜껑에 구름 깃 무늬를 두르고 꼭지는 엽전 무늬로 뚫음. 시와 서명을 바닥이 아니라 몸통에 새긴 것이 특징' },
+          { name: '진명원 참외 모양 차호', when: '18세기 초', era: '청', kind: '의흥 자사', maker: '진명원 서명', about: '아주 촘촘한 의흥 흙으로 빚은 참외 모양 차호. 몸통의 소용돌이 무늬는 손가락으로 눌러 빚은 것으로 보임' },
+          { name: '만생호', when: '1815', era: '청', kind: '의흥 자사, 낮은 원통형', maker: '양팽년 만듦, 진홍수(만생) 글', about: '문인 진홍수가 디자인과 글을 맡고 도공 양팽년이 빚은 \'만생호\'. 아래쪽 몸통에 열다섯 사람의 이름을 새김' },
+          { name: '여요 세(洗)', when: '12세기 초', era: '북송 말', kind: '여요 자기', maker: '', about: '북송 황실용으로 구운 여요의 넓적한 그릇. 남은 수가 아주 적은 자기로, 1906년에 쓴 문서가 함께 전함. 1994년 K.S. 로 재단 기증' }
+        ]
+      }
+    };
     function $(id) { return document.getElementById(id); }
     function el(tag, cls, text) {
       var n = document.createElement(tag);
@@ -1549,7 +1591,7 @@ details[open] > summary::after { transform: none; background-size: 11px 1.5px, 1
     var records;
     /* 방문 기록의 원본은 이 파일. 추가·수정·삭제는 Claude가 RECORDS를 고쳐서 한다 */
     var RECORDS = [
-      { id: 'seed-hk-tea', title: '홍콩 차박물관', venue: '홍콩 홍콩공원 안', date: '2026-09-25', time: '', visited: true, topics: ['아편전쟁'], memo: '', info: SEED_INFO }
+      { id: 'seed-hk-tea', title: '홍콩 차박물관', venue: '홍콩 홍콩공원 안', date: '2026-09-25', time: '', visited: true, topics: ['아편전쟁'], memo: '', museum: 'hk-tea-ware' }
     ];
     records = RECORDS.slice();
 
@@ -1686,16 +1728,18 @@ details[open] > summary::after { transform: none; background-size: 11px 1.5px, 1
 
         var hasTopics = r.topics && r.topics.length;
         var placeHit = D.places.filter(function (p) { return p.name === r.title; })[0];
-        var hasInfo = r.info && r.info.length;
+        var museum = r.museum && MUSEUMS[r.museum];
+        var infoRows = museum ? MUSEUM_FIELDS.filter(function (f) { return museum[f[0]]; }) : [];
+        var hasInfo = infoRows.length;
         if (hasInfo || hasTopics || placeHit) {
-          var idet = foldRow('fold-row record-row', '박물관 정보', hasInfo ? r.info.length + '가지' : '');
+          var idet = foldRow('fold-row record-row', '박물관 정보', hasInfo ? hasInfo + '가지' : '');
           var ib = el('div', 'fold-body');
           if (hasInfo) {
             var table = el('dl', 'info-table');
-            r.info.forEach(function (x) {
+            infoRows.forEach(function (f) {
               var row = el('div', 'info-row');
-              row.appendChild(el('dt', '', x[0]));
-              row.appendChild(el('dd', '', x[1]));
+              row.appendChild(el('dt', '', f[1]));
+              row.appendChild(el('dd', '', museum[f[0]]));
               table.appendChild(row);
             });
             ib.appendChild(table);
@@ -1715,6 +1759,21 @@ details[open] > summary::after { transform: none; background-size: 11px 1.5px, 1
           }
           idet.appendChild(ib);
           card.appendChild(idet);
+        }
+        if (museum && museum.works && museum.works.length) {
+          var wdet = foldRow('fold-row record-row', '대표 작품', museum.works.length + '점');
+          var wb = el('div', 'fold-body inner-list');
+          museum.works.forEach(function (w) {
+            var wr = foldRow('inner-row', w.name, '', w.when);
+            var body = el('div', 'inner-body');
+            var line = [w.era, w.kind, w.maker].filter(Boolean).join(' · ');
+            if (line) body.appendChild(el('p', 'inner-meta', line));
+            if (w.about) body.appendChild(el('p', '', w.about));
+            wr.appendChild(body);
+            wb.appendChild(wr);
+          });
+          wdet.appendChild(wb);
+          card.appendChild(wdet);
         }
         if (r.memo) {
           var det = foldRow('fold-row record-row', '메모');
