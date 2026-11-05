@@ -1025,7 +1025,7 @@ details[open] > summary::after { transform: none; background-size: 11px 1.5px, 1
     var MUSEUM_FIELDS = [
       ['name', '공식 이름'], ['kind', '성격'], ['where', '위치'], ['way', '가는 길'],
       ['building', '건물'], ['history', '역사'], ['collection', '소장품'],
-      ['hours', '운영'], ['fee', '입장료'], ['web', '누리집'], ['checked', '확인']
+      ['hours', '운영'], ['fee', '입장료'], ['web', '홈페이지'], ['checked', '확인']
     ];
     var MUSEUMS = {
       'hk-tea-ware': {
@@ -1039,7 +1039,7 @@ details[open] > summary::after { transform: none; background-size: 11px 1.5px, 1
         hours: '월·수–일 10:00–18:00. 화요일 휴관(공휴일이면 엶), 음력 설 첫 이틀 휴관. 크리스마스이브·음력 섣달그믐은 17:00까지',
         fee: '무료',
         web: 'hk.art.museum',
-        checked: '2026.10.21 공식 누리집',
+        checked: '2026.10.21 공식 홈페이지',
         works: [
           { name: '요주요 모란무늬 주자', when: '11세기', era: '북송', kind: '요주요 석기, 올리브빛 녹유', maker: '', about: '모란 가지를 새긴 주전자. 길게 굽은 부리는 가루차를 휘저어 거품 내 마시던 송나라 방식에 맞춘 모양' },
           { name: '건요 토호 찻사발', when: '12–13세기', era: '남송', kind: '건요 자기, 검은 유약', maker: '', about: '검은 유약에 토끼털 같은 가는 줄무늬(토호)가 흐르는 찻사발. 송나라 사람들이 차 맛과 거품을 겨루던 투다(鬪茶)에 썼음' },
@@ -1060,13 +1060,6 @@ details[open] > summary::after { transform: none; background-size: 11px 1.5px, 1
         web: 'muze.gov.tr',
         checked: '2026.11.04 muze.gov.tr'
       },
-      'uchisar-castle': {
-        name: '우치사르 성채(Uçhisar Kalesi)',
-        kind: '큰 바위산을 통째로 파서 쓴 요새. 카파도키아에서 가장 높은 곳 가운데 하나',
-        where: 'Uçhisar, Nevşehir',
-        way: '괴레메에서 차로 약 10분',
-        history: '옛날 감시와 방어에 쓰였다고 알려짐. 쓰기 시작한 때는 자료마다 다름'
-      },
       'derinkuyu': {
         name: '데린쿠유 지하도시(Derinkuyu Yeraltı Şehri)',
         kind: '땅속 여러 층으로 파 내려간 옛 지하도시. 이름은 깊은 우물이라는 뜻',
@@ -1077,6 +1070,27 @@ details[open] > summary::after { transform: none; background-size: 11px 1.5px, 1
         hours: '매일 08:00–17:00(매표 16:15까지)',
         web: 'muze.gov.tr',
         checked: '2026.11.04 muze.gov.tr'
+      },
+      'galata-tower': {
+        name: '갈라타 탑(Galata Kulesi)',
+        kind: '제노바 사람들이 갈라타 성벽에 세운 중세 탑. 지금은 박물관',
+        where: 'Bereketzade, Galata Kulesi, Beyoğlu/İstanbul',
+        way: 'M2 지하철 시시하네역, T1 트램 카라쾨이 정류장 근처',
+        building: '14세기 중반 제노바 식민지였던 갈라타의 성벽 일부로 지음. 지진과 화재로 여러 번 다시 고침',
+        history: '오스만 때 감옥으로 쓰다가 불을 지켜보는 망루로 바꿈. 1960년대 이스탄불시가 고쳐 다시 열었고, 2020년 재단총국이 덧붙인 콘크리트와 식당을 걷어 내고 박물관으로 엶',
+        collection: '이스탄불 역사의 모든 시대 유물. 꼭대기 층에서 도시 전체를 둘러봄',
+        hours: '매일 08:30–18:30(매표 18:14까지)',
+        web: 'muze.gov.tr',
+        checked: '2026.11.05 muze.gov.tr'
+      },
+      'spice-bazaar': {
+        name: '이집션 바자르(Mısır Çarşısı)',
+        kind: '예니 자미(새 모스크) 운영비를 대려고 지은 오스만 시장. 지금은 향신료·로쿰 가게가 많은 곳',
+        where: 'Eminönü, Fatih/İstanbul',
+        way: 'T1 트램 에미뇌뉘 정류장 근처',
+        building: '1660–1664년 메흐메트 4세의 어머니 투르한 술탄의 명으로 지음. 궁정 건축가 카즘 아아가 시작하고 무스타파 아아가 마침. 문 6개. 가게마다 앞은 나무 진열대, 뒤는 창고나 작업장',
+        history: '처음 이름은 새 시장·발리데 시장. 이집트에서 거둔 세금으로 짓고 이집트 물건과 향신료를 주로 팔아 18세기 중반부터 이집트 시장으로 부름. 큰 화재 두 번. 1941년 길이 나며 모스크와 떨어짐. 1940–1943년, 2015–2018년 복원',
+        fee: '무료'
       },
       'grand-bazaar': {
         name: '그랜드 바자르(Kapalıçarşı)',
@@ -1680,8 +1694,9 @@ details[open] > summary::after { transform: none; background-size: 11px 1.5px, 1
     /* 방문 기록의 원본은 이 파일. 추가·수정·삭제는 Claude가 RECORDS를 고쳐서 한다 */
     var RECORDS = [
       { id: 'seed-hk-tea', title: '홍콩 차박물관', venue: '홍콩 홍콩공원 안', date: '2026-09-25', time: '', visited: true, topics: ['아편전쟁'], memo: '', museum: 'hk-tea-ware' },
+      { id: 'ist-galata', title: '이스탄불 갈라타 탑', venue: '튀르키예 이스탄불 베요올루', date: '2026-10-25', time: '', visited: true, topics: ['비잔티움 제국의 쇠퇴와 멸망', '오스만 제국의 성장과 전성기'], memo: '안에는 들어가지 않고 밖에서 봄', museum: 'galata-tower' },
+      { id: 'ist-spice-bazaar', title: '이스탄불 이집션 바자르', venue: '튀르키예 이스탄불 에미뇌뉘', date: '2026-10-28', time: '', visited: true, topics: ['오스만 제국의 성장과 전성기'], memo: '11.3에 한 번 더 들름', museum: 'spice-bazaar' },
       { id: 'ist-goreme', title: '카파도키아 괴레메 야외박물관', venue: '튀르키예 카파도키아 괴레메', date: '2026-10-31', time: '', visited: true, topics: ['비잔티움 제국의 성립과 전성기', '기독교의 성장과 국교화'], memo: '열기구를 탄 날 하맘에 다녀온 뒤 들름', museum: 'goreme-open-air' },
-      { id: 'ist-uchisar', title: '카파도키아 우치사르 성채', venue: '튀르키예 카파도키아 우치사르', date: '2026-10-31', time: '', visited: true, topics: [], memo: '', museum: 'uchisar-castle' },
       { id: 'ist-derinkuyu', title: '카파도키아 데린쿠유 지하도시', venue: '튀르키예 카파도키아 데린쿠유', date: '2026-11-01', time: '', visited: true, topics: ['비잔티움 제국의 성립과 전성기', '이슬람의 등장과 확산'], memo: '', museum: 'derinkuyu' },
       { id: 'ist-grand-bazaar', title: '이스탄불 그랜드 바자르', venue: '튀르키예 이스탄불 베야즈트', date: '2026-11-02', time: '', visited: true, topics: ['오스만 제국의 성장과 전성기'], memo: '10.29 공화국의 날에는 닫혀 있어 근처만 보고, 11.2에 다시 가서 안을 구경', museum: 'grand-bazaar' },
       { id: 'ist-dolmabahce', title: '이스탄불 돌마바흐체 궁전', venue: '튀르키예 이스탄불 베식타시', date: '2026-11-04', time: '', visited: true, topics: ['오스만 제국의 쇠퇴와 멸망', '튀르키예 공화국 수립'], memo: '한국어 하루 투어로 가이드와 관람', museum: 'dolmabahce' },
