@@ -888,7 +888,7 @@ details[open] > summary::after { transform: none; background-size: 11px 1.5px, 1
 .fold-body .term-definition { color: var(--text); }
 .fold-body .memo-text { padding: 0; color: var(--text); }
 .fold-body .place-extra { margin: 0; }
-/* 박물관 정보: 왼쪽 목차, 오른쪽 내용. 함께 보기도 같은 칸에 맞춰 마지막 줄로 */
+/* 장소 정보: 왼쪽 목차, 오른쪽 내용. 함께 보기도 같은 칸에 맞춰 마지막 줄로 */
 .info-table { margin: 0; }
 .info-row,
 .info-table + .related-block {
@@ -924,6 +924,10 @@ details[open] > summary::after { transform: none; background-size: 11px 1.5px, 1
 .inner-body > p { margin: 0; }
 .inner-body > p + p { margin-top: 6px; }
 .inner-body .inner-meta { color: var(--muted); font-size: var(--fs-s); }
+.story-body > p + p { margin-top: 10px; }
+/* 장소 사진: 카드 맨 위, 카드 폭 전체 */
+.record-photo { display: block; width: 100%; aspect-ratio: 16 / 9; object-fit: cover; background: var(--line); }
+.credit-link { color: var(--accent); text-decoration: none; overflow-wrap: anywhere; }
 .fold-body > .composer-detail-name { margin: 0 0 8px; padding: 0; }
 .fold-card > .era-notes { margin-top: 0; }
 
@@ -1020,14 +1024,15 @@ details[open] > summary::after { transform: none; background-size: 11px 1.5px, 1
   (function () {
     var D = window.HIST_DATA;
     var STORE_KEY = 'history-visits-v1';
-    /* 박물관 정보의 원본. 칸 이름과 순서는 MUSEUM_FIELDS로 고정하고, 확인 못 한 칸은 비운다(화면에서 빠짐).
-       방문 기록은 museum 칸에 이 id를 적어 가리킨다. 규칙은 CLAUDE.md '박물관 정보' */
-    var MUSEUM_FIELDS = [
+    /* 장소 정보의 원본(박물관·시장·궁전·광장 등). 칸 이름과 순서는 SITE_FIELDS로 고정하고, 확인 못 한 칸은 비운다(화면에서 빠짐).
+       story = 깊이 읽기(STORY_PARTS 순서), photo = 카드 맨 위 사진. 방문 기록은 site 칸에 이 id를 적어 가리킨다. 규칙은 CLAUDE.md '장소 정보' */
+    var SITE_FIELDS = [
       ['name', '공식 이름'], ['kind', '성격'], ['where', '위치'], ['way', '가는 길'],
       ['building', '건물'], ['history', '역사'], ['collection', '소장품'],
       ['hours', '운영'], ['fee', '입장료'], ['web', '홈페이지'], ['checked', '확인']
     ];
-    var MUSEUMS = {
+    var STORY_PARTS = [['why', '왜 유명한가'], ['meaning', '역사적 의의'], ['tales', '얽힌 이야기']];
+    var SITES = {
       'hk-tea-ware': {
         name: '다구문물관(Flagstaff House Museum of Tea Ware). 홍콩 미술관 분관',
         kind: '차 도구를 전문으로 모으고 연구·전시하는 세계 첫 박물관',
@@ -1047,7 +1052,23 @@ details[open] > summary::after { transform: none; background-size: 11px 1.5px, 1
           { name: '진명원 참외 모양 차호', when: '18세기 초', era: '청', kind: '의흥 자사', maker: '진명원 서명', about: '아주 촘촘한 의흥 흙으로 빚은 참외 모양 차호. 몸통의 소용돌이 무늬는 손가락으로 눌러 빚은 것으로 보임' },
           { name: '만생호', when: '1815', era: '청', kind: '의흥 자사, 낮은 원통형', maker: '양팽년 만듦, 진홍수(만생) 글', about: '문인 진홍수가 디자인과 글을 맡고 도공 양팽년이 빚은 \'만생호\'. 아래쪽 몸통에 열다섯 사람의 이름을 새김' },
           { name: '여요 세(洗)', when: '12세기 초', era: '북송 말', kind: '여요 자기', maker: '', about: '북송 황실용으로 구운 여요의 넓적한 그릇. 남은 수가 아주 적은 자기로, 1906년에 쓴 문서가 함께 전함. 1994년 K.S. 로 재단 기증' }
-        ]
+        ],
+        photo: { file: 'images/hk-tea-ware.jpg', by: 'Harleythk2014', license: 'CC BY-SA 3.0', page: 'https://commons.wikimedia.org/wiki/File:%E8%88%8A%E4%B8%89%E8%BB%8D%E5%8F%B8%E4%BB%A4%E5%AE%98%E9%82%B8.jpg' },
+        story: {
+          why: [
+            '차 도구만 모아 연구하고 전시하는 세계 첫 박물관. 송나라 찻사발부터 명·청의 의흥 자사 차호까지, 중국 사람들이 차를 마셔 온 방식이 그릇의 변화로 한눈에 보임.',
+            '건물도 볼거리. 플래그스태프 하우스는 홍콩에 남은 가장 오래된 서양식 건물로, 1978년까지 영국군 사령관이 살던 관저.'
+          ],
+          meaning: [
+            '지은 때가 중요. 아편전쟁에서 진 청나라는 1842년 난징 조약으로 홍콩섬을 영국에 넘겼고, 바로 뒤 1844–1846년에 영국군 최고 지휘관의 집으로 세운 것이 이 건물. 홍콩이 영국 식민지로 출발하던 때를 지금까지 보여 주는 건물.',
+            '차와 아편전쟁의 인연. 영국은 청나라 차를 많이 사들이면서 은이 빠져나가자 인도에서 만든 아편을 청나라에 팔았고, 이것이 아편전쟁으로 이어짐. 차 때문에 벌어진 전쟁의 결과로 생긴 건물에 지금은 차 도구 박물관이 들어선 셈.',
+            '그릇이 바뀐 까닭도 역사. 송나라까지는 가루차를 휘저어 거품 내 마셔서 넓은 찻사발이 중요했지만, 1391년 명나라 홍무제가 떡차 대신 잎차를 바치게 한 뒤로 잎을 우려 마시는 방식이 퍼지면서 차호가 중심이 되고 의흥 자사 차호가 이름을 얻음.'
+          ],
+          tales: [
+            '소장품의 바탕을 기증한 K.S. 로(1910–1995)는 홍콩 두유 음료 ‘비타소이’를 만든 사업가. 평생 의흥 차호를 모았고, 시정국 의원으로 있으면서 비어 있던 플래그스태프 하우스를 차 도구 박물관으로 쓰자고 정부를 설득.',
+            '1994년에는 그의 재단이 귀한 도자기 25점과 옛 인장 600여 점을 더 기증해, 옆에 K.S. 로 전시관이 새로 생김.'
+          ]
+        }
       },
       'goreme-open-air': {
         name: '괴레메 야외박물관(Göreme Açık Hava Müzesi)',
@@ -1058,7 +1079,24 @@ details[open] > summary::after { transform: none; background-size: 11px 1.5px, 1
         collection: '바위 교회 안의 성경과 예수의 삶을 그린 그림. 성 바실리우스·엘말르(사과)·성 바르바라·뱀·토칼르 교회',
         hours: '매일 08:00–17:00(매표 16:15까지)',
         web: 'muze.gov.tr',
-        checked: '2026.11.04 muze.gov.tr'
+        checked: '2026.11.04 muze.gov.tr',
+        photo: { file: 'images/goreme-open-air.jpg', by: 'Dudva', license: 'CC BY-SA 4.0', page: 'https://commons.wikimedia.org/wiki/File:Dark_Church_1.jpg' },
+        story: {
+          why: [
+            '부드러운 화산암을 파서 만든 동굴 성당과 수도원이 한곳에 모인 곳. 벽화 대부분이 10–12세기 것인데, 동굴 안이라 빛을 덜 받아 색이 잘 남음.',
+            '1985년 ‘괴레메 국립공원과 카파도키아 바위 유적’으로 유네스코 세계유산 등재.'
+          ],
+          meaning: [
+            '카파도키아는 초기 기독교의 중심지. 4세기 이 지역 출신 대 바실리우스, 나지안주스의 그레고리우스, 니사의 그레고리우스(‘카파도키아 교부’)가 기독교 교리와 수도 생활의 틀을 세움.',
+            '사람 모습 없이 붉은 흙빛 십자가와 무늬만 그린 방은 성상 파괴 시대(726–843) 무렵의 것으로 보는 견해가 많음. 그 뒤로는 예수와 성인의 일생을 화려하게 그린 성당이 생겨, 한곳에서 비잔틴 미술의 변화가 보임.',
+            '바위를 파 집과 교회를 만든 건 이 땅의 지질 덕분. 화산재가 굳은 응회암은 파기 쉽고, 파 놓은 뒤 공기에 닿으면 겉이 단단해짐.'
+          ],
+          tales: [
+            '뾰족한 바위 기둥을 튀르키예어로 ‘페리 바자스(요정의 굴뚝)’라 부름. 요정이 산다고 믿었던 데서 나온 이름이라고 전함.',
+            '신약성경에도 카파도키아가 나옴. 베드로전서는 카파도키아 등에 흩어져 사는 신자들에게 보낸 편지로 시작.',
+            '‘어둠의 교회(카란르크 킬리세)’는 창이 아주 작아 빛이 거의 들지 않은 덕에 벽화 색이 특히 선명하게 남음.'
+          ]
+        }
       },
       'derinkuyu': {
         name: '데린쿠유 지하도시(Derinkuyu Yeraltı Şehri)',
@@ -1069,7 +1107,24 @@ details[open] > summary::after { transform: none; background-size: 11px 1.5px, 1
         history: '카파도키아의 지하 마을 150–200곳 가운데 하나. 위험할 때 숨어 지내던 곳. 1965년 일반에 개방. 지금 볼 수 있는 곳은 전체의 약 10%',
         hours: '매일 08:00–17:00(매표 16:15까지)',
         web: 'muze.gov.tr',
-        checked: '2026.11.04 muze.gov.tr'
+        checked: '2026.11.04 muze.gov.tr',
+        photo: { file: 'images/derinkuyu.jpg', by: 'Nevit Dilmen', license: 'CC BY-SA 3.0', page: 'https://commons.wikimedia.org/wiki/File:Derinkuyu_Underground_City_9910_Nevit.jpg' },
+        story: {
+          why: [
+            '땅속 약 85m까지 파 내려간 여러 층의 지하 도시. 지금 들어가 볼 수 있는 곳은 그 가운데 일부(약 8층).',
+            '환기 구멍, 우물, 부엌, 마구간, 포도주 짜는 곳, 교회까지 갖춰 적이 오면 사람과 가축이 오래 숨어 지낼 수 있던 곳. 수천 명이 숨을 수 있었다는 추정이 많음.'
+          ],
+          meaning: [
+            '언제 누가 처음 팠는지는 확실하지 않음. 기원전 8–7세기 프리기아 사람들이 처음 팠다는 설이 있고, 비잔틴 시대(7–10세기)에 아랍 세력의 침입을 피하려고 크게 넓힌 것으로 봄.',
+            '기원전 4세기 그리스의 크세노폰이 『아나바시스』에 아나톨리아 사람들이 가축과 함께 땅속 집에 산다고 적은 것이 이런 땅속 주거에 대한 오래된 기록으로 자주 인용.',
+            '바위 위의 동굴 성당(괴레메)과 땅속 피난처(데린쿠유)가 짝을 이룬 것이 카파도키아 역사의 특징. 평소에는 위에서 살고, 위험할 때는 아래로 내려감.'
+          ],
+          tales: [
+            '1963년 한 주민이 집을 고치다 벽 너머 통로를 찾으면서 다시 세상에 알려짐. 1969년부터 관람객을 받음.',
+            '통로 곳곳에 맷돌처럼 둥근 큰 돌문이 있어, 적이 오면 안쪽에서 굴려 막을 수 있게 만듦.',
+            '가까운 카이마클르 지하 도시와 몇 km 길이의 땅굴로 이어져 있었다고 전함.'
+          ]
+        }
       },
       'galata-tower': {
         name: '갈라타 탑(Galata Kulesi)',
@@ -1081,7 +1136,21 @@ details[open] > summary::after { transform: none; background-size: 11px 1.5px, 1
         collection: '이스탄불 역사의 모든 시대 유물. 꼭대기 층에서 도시 전체를 둘러봄',
         hours: '매일 08:30–18:30(매표 18:14까지)',
         web: 'muze.gov.tr',
-        checked: '2026.11.05 muze.gov.tr'
+        checked: '2026.11.05 muze.gov.tr',
+        story: {
+          why: [
+            '골든혼 건너 옛 시가지와 보스포루스 바다가 한눈에 보이는 이스탄불 대표 전망대. 1348년 세울 때는 도시에서 가장 높은 건물.'
+          ],
+          meaning: [
+            '13세기 후반 비잔틴 제국은 골든혼 북쪽 갈라타를 이탈리아 도시 제노바의 상인들에게 내줌. 제노바는 이곳을 성벽으로 두른 무역 기지로 키웠고, 탑은 그 성벽 가장 높은 곳에 세운 ‘그리스도의 탑’.',
+            '1453년 오스만이 콘스탄티노플을 차지할 때 갈라타는 싸우지 않고 항복해 탑이 남음. 오스만 때는 불이 났는지 살피는 감시탑으로 쓰임.',
+            '2020년 복원을 마치고 박물관으로 바뀜.'
+          ],
+          tales: [
+            '17세기 여행가 에블리야 첼레비의 『여행기』에는 헤자르펜 아흐메트 첼레비가 날개를 달고 이 탑에서 뛰어내려 보스포루스 건너 아시아 쪽 위스퀴다르까지 날아갔다는 이야기가 나옴. 이 기록 하나뿐이라 전설로 보는 견해가 많음.',
+            '‘헤자르펜’은 ‘천 가지 학문을 아는 사람’이라는 뜻의 별명.'
+          ]
+        }
       },
       'spice-bazaar': {
         name: '이집션 바자르(Mısır Çarşısı)',
@@ -1090,7 +1159,20 @@ details[open] > summary::after { transform: none; background-size: 11px 1.5px, 1
         way: 'T1 트램 에미뇌뉘 정류장 근처',
         building: '1660–1664년 메흐메트 4세의 어머니 투르한 술탄의 명으로 지음. 궁정 건축가 카즘 아아가 시작하고 무스타파 아아가 마침. 문 6개. 가게마다 앞은 나무 진열대, 뒤는 창고나 작업장',
         history: '처음 이름은 새 시장·발리데 시장. 이집트에서 거둔 세금으로 짓고 이집트 물건과 향신료를 주로 팔아 18세기 중반부터 이집트 시장으로 부름. 큰 화재 두 번. 1941년 길이 나며 모스크와 떨어짐. 1940–1943년, 2015–2018년 복원',
-        fee: '무료'
+        fee: '무료',
+        story: {
+          why: [
+            '향신료·말린 과일·견과·로쿰(튀르키예 젤리) 가게가 늘어선 이스탄불 대표 시장. 350년 넘게 같은 건물에서 장사가 이어지는 오스만 시장.'
+          ],
+          meaning: [
+            '이 시장은 바로 옆 예니 자미(새 모스크)를 먹여 살리려고 지은 건물. 오스만에서는 큰 모스크를 지을 때 시장·목욕탕 같은 건물을 함께 지어 그 임대료로 모스크와 학교, 무료 급식소를 꾸렸고, 이런 재산을 와크프(기부 재단)라 부름.',
+            '예니 자미는 1597년 사피예 술탄이 짓기 시작했다가 멈췄고, 60년쯤 지나 메흐메트 4세의 어머니 투르한 술탄이 1665년에 마무리. 술탄의 어머니(발리데 술탄)가 나라를 움직일 만큼 큰 힘을 가졌던 시대를 보여 줌.'
+          ],
+          tales: [
+            '‘이집트 시장’이라는 이름은 이집트에서 거둔 세금으로 짓고, 이집트를 거쳐 온 향신료를 주로 판 데서 생김.',
+            '옛날에는 향신료와 함께 약초·약재를 파는 ‘악타르’ 가게가 많아 동네 약국 노릇도 함.'
+          ]
+        }
       },
       'grand-bazaar': {
         name: '그랜드 바자르(Kapalıçarşı)',
@@ -1099,7 +1181,21 @@ details[open] > summary::after { transform: none; background-size: 11px 1.5px, 1
         way: 'T1 트램 베야즈트-카팔르차르쉬 정류장 근처',
         building: '1455년쯤 메흐메트 2세가 짓기 시작한 중심 건물에서 커진 시장. 거리 61개에 가게 4,000개 이상',
         history: '오스만이 이스탄불을 차지한 직후 시작. 화재와 지진을 여러 번 겪고 다시 지음. 같은 물건을 파는 가게끼리 한 거리에 모이는 옛 방식',
-        fee: '무료'
+        fee: '무료',
+        story: {
+          why: [
+            '지붕으로 덮인 시장 가운데 세계에서 가장 오래되고 큰 편에 드는 곳. 거리 61개에 가게 4,000개 이상.'
+          ],
+          meaning: [
+            '1453년 콘스탄티노플을 차지한 메흐메트 2세가 1455–1461년 무렵 귀한 옷감을 사고파는 건물(지금의 보석 베데스텐)을 짓고, 그 임대료를 모스크로 바뀐 아야소피아에 쓰게 함. 시장과 모스크가 와크프로 묶인 오스만 도시의 기본 틀.',
+            '같은 물건을 파는 가게가 한 거리에 모이고, 상인 조합이 품질과 값을 관리하던 옛 방식이 지금도 거리 이름에 남음.',
+            '시장 둘레의 ‘한(han)’은 먼 길을 온 상인이 묵고 짐을 맡기던 숙소 겸 창고. 이스탄불이 동서 무역의 길목이었다는 흔적.'
+          ],
+          tales: [
+            '가운데 베데스텐은 두꺼운 벽과 철문으로 지어 밤에는 잠갔고, 상인들이 귀중품을 맡기는 금고 노릇도 함.',
+            '화재와 지진을 여러 번 겪었고, 1894년 큰 지진 때 크게 무너져 다시 지음.'
+          ]
+        }
       },
       'dolmabahce': {
         name: '돌마바흐체 궁전(Dolmabahçe Sarayı). 국가궁전청(Millî Saraylar) 관리',
@@ -1111,7 +1207,22 @@ details[open] > summary::after { transform: none; background-size: 11px 1.5px, 1
         hours: '매표 09:00–17:00. 월요일, 1월 1일, 라마잔 바이람·쿠르반 바이람 첫날 휴관',
         fee: '외국인 2,000리라(셀람르크·하렘·회화 박물관 통합권)',
         web: 'millisaraylar.gov.tr',
-        checked: '2026.11.04 millisaraylar.gov.tr'
+        checked: '2026.11.04 millisaraylar.gov.tr',
+        story: {
+          why: [
+            '보스포루스 바닷가를 따라 길게 선 오스만 마지막 시대의 궁전. 유럽 궁전을 본뜬 큰 홀, 크리스털 계단, 약 4.5톤짜리 샹들리에로 유명.'
+          ],
+          meaning: [
+            '이름 ‘돌마바흐체’는 ‘메운 정원’이라는 뜻. 17세기부터 바다였던 만을 조금씩 메워 술탄의 정원으로 쓰던 자리.',
+            '1856년 술탄이 400년 가까이 쓰던 톱카프 궁전을 떠나 이곳으로 옮김. 서양식 제도를 들여오던 탄지마트 개혁 시대에, 오스만도 유럽 열강과 같은 나라라는 것을 보여 주려 한 건물.',
+            '공사비가 나라 살림에 큰 짐. 이 무렵 오스만은 처음으로 외국에서 돈을 빌렸고(1854), 1875년에는 빚을 갚지 못하는 지경에 이름.',
+            '1922년 11월 17일 마지막 술탄 메흐메트 6세가 이 궁전을 떠나 영국 군함을 타고 망명했고, 1938년 11월 10일 튀르키예 공화국을 세운 아타튀르크가 이곳에서 세상을 떠남. 제국의 끝과 공화국의 시작이 한 건물에 겹침.'
+          ],
+          tales: [
+            '아타튀르크가 숨진 방의 시계는 지금도 그 시각인 9시 5분에 멈춰 있음.',
+            '큰 샹들리에가 영국 빅토리아 여왕의 선물이라는 이야기가 오래 전했지만, 술탄이 값을 치른 영수증이 나와 사실이 아닌 것으로 봄.'
+          ]
+        }
       },
       'blue-mosque': {
         name: '술탄 아흐메트 모스크(Sultan Ahmet Camii). 블루 모스크',
@@ -1120,7 +1231,22 @@ details[open] > summary::after { transform: none; background-size: 11px 1.5px, 1
         way: 'T1 트램 술탄아흐메트 정류장 근처',
         building: '1609–1616년 술탄 아흐메트 1세 때 지음. 설계 세데프카르 메흐메트 아아(시난의 제자). 첨탑 6개, 안쪽 벽에 이즈니크 푸른 타일 2만 장 넘게 붙음',
         history: '맞은편 아야소피아에 맞서는 큰 모스크로 지었다고 전함. 오랜 복원을 마치고 2023년 4월 다시 엶. 바로 옆에 아흐메트 1세와 가족의 묘당',
-        fee: '무료'
+        fee: '무료',
+        story: {
+          why: [
+            '안쪽 벽을 덮은 이즈니크 푸른 타일 때문에 ‘블루 모스크’라 불리는 이스탄불 대표 모스크. 첨탑 6개를 가진 드문 모스크이고, 지금도 하루 다섯 번 예배하는 곳.'
+          ],
+          meaning: [
+            '아야소피아 바로 맞은편에 지음. 비잔틴의 가장 큰 성당과 마주 보는 자리에 오스만 고전 건축의 대표작을 세워, 두 제국의 건축이 광장 하나를 사이에 두고 마주하게 됨.',
+            '설계자 세데프카르 메흐메트 아아는 대건축가 시난의 제자. 큰 가운데 돔을 반돔 네 개가 받치는 구조로, 시난이 이어 온 오스만 모스크 건축을 마무리한 작품으로 꼽힘.',
+            '모스크만이 아니라 학교(메드레세), 묘당, 시장(아라스타 바자르), 무료 급식소를 함께 지은 퀼리예(복합 단지).'
+          ],
+          tales: [
+            '첨탑 6개는 메카의 성스러운 모스크와 같은 수라 비판을 받았고, 그래서 술탄이 메카에 첨탑 하나를 더 세우게 했다는 이야기가 전함. 다만 이를 뒷받침하는 기록은 약함.',
+            '술탄이 ‘황금(알튼) 첨탑’을 주문했는데 건축가가 ‘여섯(알트)’으로 잘못 알아들었다는 이야기도 있지만, 지어낸 이야기로 봄.',
+            '아흐메트 1세는 열세 살에 술탄이 되었고, 모스크가 완성된 이듬해인 1617년 스물일곱 살로 세상을 떠나 바로 옆 묘당에 묻힘.'
+          ]
+        }
       },
       'hippodrome': {
         name: '히포드롬 광장(Sultanahmet Meydanı)',
@@ -1129,7 +1255,22 @@ details[open] > summary::after { transform: none; background-size: 11px 1.5px, 1
         way: 'T1 트램 술탄아흐메트 정류장 근처',
         history: '200년쯤 셉티미우스 세베루스가 짓기 시작했고 콘스탄티누스가 크게 넓힘. 532년 니카의 반란이 일어난 곳',
         collection: '이집트 오벨리스크(기원전 15세기 투트모세 3세, 390년에 옮겨 옴), 뱀 모양 청동 기둥(기원전 5세기 그리스가 페르시아를 이긴 기념물, 델포이에서 옮겨 옴), 독일 분수(1901년쯤)',
-        fee: '무료'
+        fee: '무료',
+        story: {
+          why: [
+            '지금은 평범한 광장이지만, 1,000년 넘게 비잔틴 제국 수도에서 사람이 가장 많이 모이던 전차 경주장 자리. 고대 이집트·그리스에서 옮겨 온 기념물이 아직 서 있는 야외 박물관 같은 곳.'
+          ],
+          meaning: [
+            '경주장은 오락 시설이면서 정치 무대. 황제가 관람석에 나와 시민을 만났고, 경주 팀을 응원하던 청색당과 녹색당은 정치 세력이기도 함.',
+            '532년 두 당이 손잡고 ‘니카(이겨라)!’를 외치며 일으킨 반란으로 도시 곳곳이 불탔고, 역사가 프로코피우스는 진압 때 이 경주장 안에서만 약 3만 명이 죽었다고 적음. 이때 불탄 성당 자리에 유스티니아누스가 새로 지은 것이 지금의 아야소피아.',
+            '1204년 제4차 십자군이 도시를 약탈할 때 청동 말 네 마리를 베네치아로 가져간 것으로 알려짐. 지금 베네치아 산마르코 대성당의 말 조각.'
+          ],
+          tales: [
+            '이집트 오벨리스크는 기원전 15세기 투트모세 3세가 이집트 카르나크 신전에 세운 것. 390년 테오도시우스 1세가 옮겨 세웠고, 받침돌에는 황제가 관람석에서 경주를 보는 모습이 새겨져 있음.',
+            '뱀 기둥은 기원전 479년 플라타이아 전투에서 그리스가 페르시아를 이긴 뒤 델포이 신전에 바친 기념물. 콘스탄티누스가 옮겨 왔고, 떨어져 나간 뱀 머리 하나는 이스탄불 고고학 박물관에 있음.',
+            '독일 분수는 1898년 이스탄불을 찾은 독일 황제 빌헬름 2세가 그 방문을 기념해 보낸 선물.'
+          ]
+        }
       },
       'basilica-cistern': {
         name: '예레바탄 지하저수지(Yerebatan Sarnıcı). 바실리카 시스턴',
@@ -1138,7 +1279,22 @@ details[open] > summary::after { transform: none; background-size: 11px 1.5px, 1
         way: 'T1 트램 술탄아흐메트 정류장 근처',
         building: '532년쯤 유스티니아누스 1세 때 만듦. 길이 약 138m·폭 약 65m, 높이 약 9m 돌기둥 336개. 많은 기둥이 옛 건물에서 가져온 것으로 보임',
         history: '큰 궁전과 주변 건물에 물을 대던 곳. 오스만 때도 물을 댐. 2020–2022년 지진 보강 공사 뒤 다시 엶',
-        collection: '기둥 밑받침으로 거꾸로·옆으로 놓인 메두사 머리 조각. 왜 그렇게 놓였는지는 알려지지 않음'
+        collection: '기둥 밑받침으로 거꾸로·옆으로 놓인 메두사 머리 조각. 왜 그렇게 놓였는지는 알려지지 않음',
+        story: {
+          why: [
+            '336개 돌기둥이 물 위에 줄지어 선 비잔틴 시대의 지하 저수지. 어둑한 조명 속 기둥 숲과 거꾸로 놓인 메두사 머리로 유명.'
+          ],
+          meaning: [
+            '콘스탄티노플은 큰 강이 없어, 멀리서 수로로 끌어온 물을 땅속 저수지에 모아 두고 씀. 이곳은 그 가운데 가장 큰 축에 드는 저수지로, 황제의 큰 궁전에 물을 댐.',
+            '위쪽에 ‘바실리카’라 부르던 큰 건물이 있어서 바실리카 시스턴이라는 이름이 붙음. 튀르키예 이름 ‘예레바탄’은 ‘땅속으로 가라앉은’이라는 뜻.',
+            '기둥 가운데 많은 수가 다른 옛 건물에서 가져온 것이라 모양과 장식이 제각각. 로마 시대 건물 재료를 다시 쓴 흔적.'
+          ],
+          tales: [
+            '서양 사람들 기억에서 잊혔다가 1545년쯤 프랑스 학자 페트루스 길리우스가 다시 찾아냄. 동네 사람들이 집 바닥 구멍으로 두레박을 내려 물을 긷고 물고기까지 잡는다는 말을 듣고 아래에 저수지가 있다는 것을 알아냈다고 전함.',
+            '메두사 머리가 왜 거꾸로·옆으로 놓였는지는 모름. 눈이 마주치면 돌이 된다는 신화 때문에 일부러 눕혔다는 이야기와, 기둥 높이를 맞추려고 그렇게 놓았다는 설명이 함께 전함.',
+            '영화 「007 위기일발」(1963)을 이곳에서 찍음.'
+          ]
+        }
       },
       'hagia-sophia': {
         name: '아야소피아(Ayasofya). 하기아 소피아',
@@ -1147,7 +1303,23 @@ details[open] > summary::after { transform: none; background-size: 11px 1.5px, 1
         way: 'T1 트램 술탄아흐메트 정류장 근처',
         building: '532–537년 유스티니아누스 1세 때 지음. 설계 안테미오스와 이시도로스. 하늘에 떠 있는 것처럼 보이는 큰 돔',
         history: '916년 동안 기독교 성당. 1453년 메흐메트 2세가 모스크로 바꾸고 첨탑을 세움. 1935년 박물관, 2020년 7월 다시 모스크',
-        collection: '위층 갤러리의 비잔틴 모자이크(성모와 아기 예수, 황제 부부)'
+        collection: '위층 갤러리의 비잔틴 모자이크(성모와 아기 예수, 황제 부부)',
+        story: {
+          why: [
+            '537년에 완성된 비잔틴 제국의 대성당으로, 1,500년 가까이 이스탄불 한가운데 서 있는 건물. 공중에 떠 있는 듯한 지름 약 31m의 큰 돔은 뒤에 지은 수많은 성당과 모스크의 본보기가 됨.'
+          ],
+          meaning: [
+            '니카의 반란(532)으로 앞의 성당이 불타자 유스티니아누스 1세가 6년이 안 되는 짧은 기간에 새로 지음. 그 뒤 약 1,000년 동안 세계에서 가장 큰 성당.',
+            '동방 정교회의 중심. 1054년 로마 교회와 동방 교회가 서로 파문하며 갈라질 때, 교황 사절이 파문장을 놓고 간 곳이 이 성당의 제단.',
+            '1204년 제4차 십자군이 같은 기독교 도시를 약탈하고 이곳을 가톨릭 성당으로 씀. 원정을 이끈 베네치아 총독 엔리코 단돌로가 이 성당에 묻혔고, 2층 회랑에 그 이름을 새긴 표석이 있음(원래 무덤은 남지 않음).',
+            '1453년 메흐메트 2세가 도시를 차지한 직후 모스크로 바꿈. 이후 쉴레이마니예, 블루 모스크 같은 오스만의 큰 모스크들이 이 건물의 돔 구조를 본받음. 1935년 박물관, 2020년 다시 모스크. 한 건물이 성당·모스크·박물관을 모두 거친 셈.'
+          ],
+          tales: [
+            '완성된 날 유스티니아누스가 ‘솔로몬이여, 내가 그대를 이겼노라’라고 외쳤다는 이야기가 전함. 솔로몬이 지은 예루살렘 성전보다 낫다는 뜻.',
+            '첫 돔은 558년 지진으로 무너졌고, 562년 더 높이 다시 올림.',
+            '모자이크는 오스만 때 회칠로 덮였다가 1930년대 미국 학자들이 덮개를 걷어 다시 드러냄. 위층 회랑의 데이시스(예수와 성모, 세례 요한) 모자이크가 특히 유명.'
+          ]
+        }
       },
       'topkapi': {
         name: '톱카프 궁전 박물관(Topkapı Sarayı Müzesi). 국가궁전청(Millî Saraylar) 관리',
@@ -1159,7 +1331,22 @@ details[open] > summary::after { transform: none; background-size: 11px 1.5px, 1
         hours: '매표 09:00–17:00. 화요일 휴관',
         fee: '외국인 2,750리라(궁전·아야 이리니·하렘 통합권), 하렘만 1,050리라',
         web: 'millisaraylar.gov.tr',
-        checked: '2026.11.04 millisaraylar.gov.tr'
+        checked: '2026.11.04 millisaraylar.gov.tr',
+        story: {
+          why: [
+            '약 400년 동안 오스만 제국을 다스린 궁전. 술탄 가족이 살던 하렘, 나라 일을 의논하던 회의실, 보물관, 이슬람 성유물실이 한 단지에 모여 있음.'
+          ],
+          meaning: [
+            '1453년 콘스탄티노플을 차지한 메흐메트 2세가 골든혼과 보스포루스, 마르마라해가 만나는 언덕 끝에 지은 ‘새 궁전’. 세 바다를 내려다보는 자리 자체가 이 도시를 다스리는 상징.',
+            '안쪽 뜰로 갈수록 들어갈 수 있는 사람이 줄어드는 구조. 바깥 뜰은 누구나, 둘째 뜰은 회의(디반)에 온 관리, 셋째 뜰부터는 술탄 가까운 사람만. 궁전 배치가 제국의 위계를 그대로 보여 줌.',
+            '1517년 이집트를 정복한 셀림 1세가 예언자 무함마드의 외투와 칼 같은 성유물을 가져오면서, 이 궁전이 이슬람 세계를 이끄는 칼리프의 자리라는 상징이 됨.',
+            '16세기 후반부터 하렘이 궁 안으로 들어오며 술탄의 어머니와 왕비들이 정치에 큰 힘을 쓴 ‘여인들의 술탄 시대’가 이어짐.'
+          ],
+          tales: [
+            '보물관의 ‘톱카프 단검’은 마흐무트 1세가 페르시아의 나디르 샤에게 보내려던 선물. 가는 길에 나디르 샤가 암살당해(1747) 궁으로 되돌아옴. 1964년 영화 「토프카피」가 이 단검을 훔치는 이야기.',
+            '86캐럿 ‘숟가락 장수의 다이아몬드’는 어부가 주운 돌을 숟가락 몇 개와 바꿨다는 이야기 등 여러 설이 있지만, 어디서 왔는지는 확실하지 않음.'
+          ]
+        }
       }
     };
     function $(id) { return document.getElementById(id); }
@@ -1693,18 +1880,18 @@ details[open] > summary::after { transform: none; background-size: 11px 1.5px, 1
     var records;
     /* 방문 기록의 원본은 이 파일. 추가·수정·삭제는 Claude가 RECORDS를 고쳐서 한다 */
     var RECORDS = [
-      { id: 'seed-hk-tea', title: '홍콩 차박물관', venue: '홍콩 홍콩공원 안', date: '2026-09-25', time: '', visited: true, topics: ['아편전쟁'], memo: '', museum: 'hk-tea-ware' },
-      { id: 'ist-galata', title: '이스탄불 갈라타 탑', venue: '튀르키예 이스탄불 베요올루', date: '2026-10-25', time: '', visited: true, topics: ['비잔티움 제국의 쇠퇴와 멸망', '오스만 제국의 성장과 전성기'], memo: '안에는 들어가지 않고 밖에서 봄', museum: 'galata-tower' },
-      { id: 'ist-spice-bazaar', title: '이스탄불 이집션 바자르', venue: '튀르키예 이스탄불 에미뇌뉘', date: '2026-10-28', time: '', visited: true, topics: ['오스만 제국의 성장과 전성기'], memo: '11.3에 한 번 더 들름', museum: 'spice-bazaar' },
-      { id: 'ist-goreme', title: '카파도키아 괴레메 야외박물관', venue: '튀르키예 카파도키아 괴레메', date: '2026-10-31', time: '', visited: true, topics: ['비잔티움 제국의 성립과 전성기', '기독교의 성장과 국교화'], memo: '열기구를 탄 날 하맘에 다녀온 뒤 들름', museum: 'goreme-open-air' },
-      { id: 'ist-derinkuyu', title: '카파도키아 데린쿠유 지하도시', venue: '튀르키예 카파도키아 데린쿠유', date: '2026-11-01', time: '', visited: true, topics: ['비잔티움 제국의 성립과 전성기', '이슬람의 등장과 확산'], memo: '', museum: 'derinkuyu' },
-      { id: 'ist-grand-bazaar', title: '이스탄불 그랜드 바자르', venue: '튀르키예 이스탄불 베야즈트', date: '2026-11-02', time: '', visited: true, topics: ['오스만 제국의 성장과 전성기'], memo: '10.29 공화국의 날에는 닫혀 있어 근처만 보고, 11.2에 다시 가서 안을 구경', museum: 'grand-bazaar' },
-      { id: 'ist-dolmabahce', title: '이스탄불 돌마바흐체 궁전', venue: '튀르키예 이스탄불 베식타시', date: '2026-11-04', time: '', visited: true, topics: ['오스만 제국의 쇠퇴와 멸망', '튀르키예 공화국 수립'], memo: '한국어 하루 투어로 가이드와 관람', museum: 'dolmabahce' },
-      { id: 'ist-blue-mosque', title: '이스탄불 블루 모스크', venue: '튀르키예 이스탄불 술탄아흐메트', date: '2026-11-04', time: '', visited: true, topics: ['오스만 제국의 성장과 전성기'], memo: '바로 옆 술탄 아흐메트 1세 묘당도 함께 봄', museum: 'blue-mosque' },
-      { id: 'ist-hippodrome', title: '이스탄불 히포드롬 광장', venue: '튀르키예 이스탄불 술탄아흐메트', date: '2026-11-04', time: '', visited: true, topics: ['로마 제국의 성립과 분열', '비잔티움 제국의 성립과 전성기'], memo: '', museum: 'hippodrome' },
-      { id: 'ist-cistern', title: '이스탄불 예레바탄 지하저수지', venue: '튀르키예 이스탄불 술탄아흐메트', date: '2026-11-04', time: '', visited: true, topics: ['비잔티움 제국의 성립과 전성기'], memo: '', museum: 'basilica-cistern' },
-      { id: 'ist-hagia-sophia', title: '이스탄불 하기아 소피아', venue: '튀르키예 이스탄불 술탄아흐메트', date: '2026-11-04', time: '', visited: true, topics: ['비잔티움 제국의 성립과 전성기', '비잔티움 제국의 쇠퇴와 멸망'], memo: '투어에서 밖에서 해설만 듣고 안에는 들어가지 않음', museum: 'hagia-sophia' },
-      { id: 'ist-topkapi', title: '이스탄불 톱카프 궁전', venue: '튀르키예 이스탄불 술탄아흐메트', date: '2026-11-04', time: '', visited: true, topics: ['오스만 제국의 성장과 전성기'], memo: '하렘까지 관람', museum: 'topkapi' }
+      { id: 'seed-hk-tea', title: '홍콩 차박물관', venue: '홍콩 홍콩공원 안', date: '2026-09-25', time: '', visited: true, topics: ['아편전쟁'], memo: '', site: 'hk-tea-ware' },
+      { id: 'ist-galata', title: '이스탄불 갈라타 탑', venue: '튀르키예 이스탄불 베요올루', date: '2026-10-25', time: '', visited: true, topics: ['비잔티움 제국의 쇠퇴와 멸망', '오스만 제국의 성장과 전성기'], memo: '안에는 들어가지 않고 밖에서 봄', site: 'galata-tower' },
+      { id: 'ist-spice-bazaar', title: '이스탄불 이집션 바자르', venue: '튀르키예 이스탄불 에미뇌뉘', date: '2026-10-28', time: '', visited: true, topics: ['오스만 제국의 성장과 전성기'], memo: '11.3에 한 번 더 들름', site: 'spice-bazaar' },
+      { id: 'ist-goreme', title: '카파도키아 괴레메 야외박물관', venue: '튀르키예 카파도키아 괴레메', date: '2026-10-31', time: '', visited: true, topics: ['비잔티움 제국의 성립과 전성기', '기독교의 성장과 국교화'], memo: '열기구를 탄 날 하맘에 다녀온 뒤 들름', site: 'goreme-open-air' },
+      { id: 'ist-derinkuyu', title: '카파도키아 데린쿠유 지하도시', venue: '튀르키예 카파도키아 데린쿠유', date: '2026-11-01', time: '', visited: true, topics: ['비잔티움 제국의 성립과 전성기', '이슬람의 등장과 확산'], memo: '', site: 'derinkuyu' },
+      { id: 'ist-grand-bazaar', title: '이스탄불 그랜드 바자르', venue: '튀르키예 이스탄불 베야즈트', date: '2026-11-02', time: '', visited: true, topics: ['오스만 제국의 성장과 전성기'], memo: '10.29 공화국의 날에는 닫혀 있어 근처만 보고, 11.2에 다시 가서 안을 구경', site: 'grand-bazaar' },
+      { id: 'ist-dolmabahce', title: '이스탄불 돌마바흐체 궁전', venue: '튀르키예 이스탄불 베식타시', date: '2026-11-04', time: '', visited: true, topics: ['오스만 제국의 쇠퇴와 멸망', '튀르키예 공화국 수립'], memo: '한국어 하루 투어로 가이드와 관람', site: 'dolmabahce' },
+      { id: 'ist-blue-mosque', title: '이스탄불 블루 모스크', venue: '튀르키예 이스탄불 술탄아흐메트', date: '2026-11-04', time: '', visited: true, topics: ['오스만 제국의 성장과 전성기'], memo: '바로 옆 술탄 아흐메트 1세 묘당도 함께 봄', site: 'blue-mosque' },
+      { id: 'ist-hippodrome', title: '이스탄불 히포드롬 광장', venue: '튀르키예 이스탄불 술탄아흐메트', date: '2026-11-04', time: '', visited: true, topics: ['로마 제국의 성립과 분열', '비잔티움 제국의 성립과 전성기'], memo: '', site: 'hippodrome' },
+      { id: 'ist-cistern', title: '이스탄불 예레바탄 지하저수지', venue: '튀르키예 이스탄불 술탄아흐메트', date: '2026-11-04', time: '', visited: true, topics: ['비잔티움 제국의 성립과 전성기'], memo: '', site: 'basilica-cistern' },
+      { id: 'ist-hagia-sophia', title: '이스탄불 하기아 소피아', venue: '튀르키예 이스탄불 술탄아흐메트', date: '2026-11-04', time: '', visited: true, topics: ['비잔티움 제국의 성립과 전성기', '비잔티움 제국의 쇠퇴와 멸망'], memo: '투어에서 밖에서 해설만 듣고 안에는 들어가지 않음', site: 'hagia-sophia' },
+      { id: 'ist-topkapi', title: '이스탄불 톱카프 궁전', venue: '튀르키예 이스탄불 술탄아흐메트', date: '2026-11-04', time: '', visited: true, topics: ['오스만 제국의 성장과 전성기'], memo: '하렘까지 관람', site: 'topkapi' }
     ];
     records = RECORDS.slice();
 
@@ -1810,6 +1997,15 @@ details[open] > summary::after { transform: none; background-size: 11px 1.5px, 1
         var card = el('article', 'record');
         card.setAttribute('data-id', r.id);
         card.setAttribute('data-status', r._status);
+        var site = r.site && SITES[r.site];
+        if (site && site.photo) {
+          var photo = el('img', 'record-photo');
+          photo.src = site.photo.file;
+          photo.alt = r.title;
+          photo.loading = 'lazy';
+          photo.decoding = 'async';
+          card.appendChild(photo);
+        }
         var top = el('div', 'record-top');
         var db = el('div', 'date-block');
         if (r.date) {
@@ -1841,20 +2037,31 @@ details[open] > summary::after { transform: none; background-size: 11px 1.5px, 1
 
         var hasTopics = r.topics && r.topics.length;
         var placeHit = D.places.filter(function (p) { return p.name === r.title; })[0];
-        var museum = r.museum && MUSEUMS[r.museum];
-        var infoRows = museum ? MUSEUM_FIELDS.filter(function (f) { return museum[f[0]]; }) : [];
-        var hasInfo = infoRows.length;
+        var infoRows = site ? SITE_FIELDS.filter(function (f) { return site[f[0]]; }) : [];
+        var hasInfo = infoRows.length + (site && site.photo ? 1 : 0);
         if (hasInfo || hasTopics || placeHit) {
-          var idet = foldRow('fold-row record-row', '박물관 정보', hasInfo ? hasInfo + '가지' : '');
+          var idet = foldRow('fold-row record-row', '장소 정보', hasInfo ? hasInfo + '가지' : '');
           var ib = el('div', 'fold-body');
           if (hasInfo) {
             var table = el('dl', 'info-table');
             infoRows.forEach(function (f) {
               var row = el('div', 'info-row');
               row.appendChild(el('dt', '', f[1]));
-              row.appendChild(el('dd', '', museum[f[0]]));
+              row.appendChild(el('dd', '', site[f[0]]));
               table.appendChild(row);
             });
+            if (site.photo) {
+              var prow = el('div', 'info-row');
+              prow.appendChild(el('dt', '', '사진'));
+              var pdd = el('dd');
+              var credit = el('a', 'credit-link', [site.photo.by, site.photo.license].filter(Boolean).join(' · '));
+              credit.href = site.photo.page;
+              credit.target = '_blank';
+              credit.rel = 'noopener';
+              pdd.appendChild(credit);
+              prow.appendChild(pdd);
+              table.appendChild(prow);
+            }
             ib.appendChild(table);
           }
           if (hasTopics || placeHit) {
@@ -1873,10 +2080,24 @@ details[open] > summary::after { transform: none; background-size: 11px 1.5px, 1
           idet.appendChild(ib);
           card.appendChild(idet);
         }
-        if (museum && museum.works && museum.works.length) {
-          var wdet = foldRow('fold-row record-row', '대표 작품', museum.works.length + '점');
+        var storyParts = site && site.story ? STORY_PARTS.filter(function (p) { return site.story[p[0]] && site.story[p[0]].length; }) : [];
+        if (storyParts.length) {
+          var sdet = foldRow('fold-row record-row', '깊이 읽기', storyParts.length + '가지');
+          var sb = el('div', 'fold-body inner-list');
+          storyParts.forEach(function (p) {
+            var sr = foldRow('inner-row', p[1]);
+            var body = el('div', 'inner-body story-body');
+            site.story[p[0]].forEach(function (t) { body.appendChild(el('p', '', t)); });
+            sr.appendChild(body);
+            sb.appendChild(sr);
+          });
+          sdet.appendChild(sb);
+          card.appendChild(sdet);
+        }
+        if (site && site.works && site.works.length) {
+          var wdet = foldRow('fold-row record-row', '대표 작품', site.works.length + '점');
           var wb = el('div', 'fold-body inner-list');
-          museum.works.forEach(function (w) {
+          site.works.forEach(function (w) {
             var wr = foldRow('inner-row', w.name, '', w.when);
             var body = el('div', 'inner-body');
             var line = [w.era, w.kind, w.maker].filter(Boolean).join(' · ');
