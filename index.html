@@ -931,6 +931,11 @@ details[open] > summary::after { transform: none; background-size: 11px 1.5px, 1
 .story-label { margin: 0 0 6px; color: var(--muted); font-size: var(--fs-s); font-weight: 400; line-height: 1.5; }
 .story-sec > p { margin: 0; }
 .story-sec > p + p { margin-top: 10px; }
+/* 대표 작품: 깊이 읽기와 같이 한 번에. 작품 이름(16px 굵게) + 오른쪽 회색 연도, 아래 회색 한 줄, 설명 */
+.work-head { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; margin: 0 0 4px; }
+.work-name { min-width: 0; font-size: var(--fs-m); font-weight: 700; }
+.work-sec > .work-meta { color: var(--muted); font-size: var(--fs-s); }
+.work-sec > .work-meta + p { margin-top: 6px; }
 /* 장소 사진: 카드 맨 위, 카드 폭 전체 */
 .record-photo { display: block; width: 100%; aspect-ratio: 16 / 9; object-fit: cover; background: var(--line); }
 .credit-link { color: var(--accent); text-decoration: none; overflow-wrap: anywhere; }
@@ -1901,7 +1906,11 @@ details[open] > summary::after { transform: none; background-size: 11px 1.5px, 1
     ];
     records = RECORDS.slice();
 
-    /* 예전 판에서 이 기기에 저장한 추가·수정·삭제. 화면에는 쓰지 않고, 남아 있으면 복사해서 Claude에게 보내도록 알린다 */
+    /* 예전 판에서 이 기기에 저장한 추가·수정·삭제. 화면에는 쓰지 않고, 남아 있으면 복사해서 Claude에게 보내도록 알린다.
+       비교 기준은 예전 판(기기에 저장하던 때) 파일에 있던 기록 OLD_RECORDS. 그 뒤 파일에 더한 기록은 기기에 없는 게 당연하니 지운 기록으로 세지 않는다 */
+    var OLD_RECORDS = [
+      { id: 'seed-hk-tea', title: '홍콩 차박물관', venue: '홍콩 홍콩공원 안', date: '2026-09-25', time: '', visited: true, topics: ['아편전쟁'], memo: '' }
+    ];
     function recordKey(r) { return JSON.stringify([r.title || '', r.venue || '', r.date || '', r.time || '', !!r.visited, r.topics || [], r.memo || '']); }
     function leftovers() {
       var stored = null, added = [], edited = [], removed = [];
@@ -1909,16 +1918,17 @@ details[open] > summary::after { transform: none; background-size: 11px 1.5px, 1
         stored = JSON.parse(window.localStorage.getItem(STORE_KEY) || 'null');
       } catch (e) { stored = null; }
       if (!Array.isArray(stored)) return { added: added, edited: edited, removed: removed, n: 0 };
-      var byId = {};
-      RECORDS.forEach(function (r) { byId[r.id] = r; });
+      var oldById = {}, nowById = {};
+      OLD_RECORDS.forEach(function (r) { oldById[r.id] = r; });
+      RECORDS.forEach(function (r) { nowById[r.id] = r; });
       stored.forEach(function (r) {
         if (!r || typeof r.title !== 'string') return;
-        var f = byId[r.id];
-        if (!f) added.push(r);
-        else if (recordKey(r) !== recordKey(f)) edited.push(r);
+        var o = oldById[r.id], f = nowById[r.id];
+        if (!o) { if (!f) added.push(r); }
+        else if (recordKey(r) !== recordKey(o) && (!f || recordKey(r) !== recordKey(f))) edited.push(r);
       });
-      RECORDS.forEach(function (f) {
-        if (!stored.some(function (r) { return r && r.id === f.id; })) removed.push(f);
+      OLD_RECORDS.forEach(function (o) {
+        if (nowById[o.id] && !stored.some(function (r) { return r && r.id === o.id; })) removed.push(o);
       });
       return { added: added, edited: edited, removed: removed, n: added.length + edited.length + removed.length };
     }
@@ -2101,15 +2111,17 @@ details[open] > summary::after { transform: none; background-size: 11px 1.5px, 1
         }
         if (site && site.works && site.works.length) {
           var wdet = foldRow('fold-row record-row', '대표 작품', site.works.length + '점');
-          var wb = el('div', 'fold-body inner-list');
+          var wb = el('div', 'fold-body');
           site.works.forEach(function (w) {
-            var wr = foldRow('inner-row', w.name, '', w.when);
-            var body = el('div', 'inner-body');
+            var sec = el('section', 'story-sec work-sec');
+            var head = el('div', 'work-head');
+            head.appendChild(el('strong', 'work-name', w.name));
+            if (w.when) head.appendChild(el('span', 'row-year', w.when));
+            sec.appendChild(head);
             var line = [w.era, w.kind, w.maker].filter(Boolean).join(' · ');
-            if (line) body.appendChild(el('p', 'inner-meta', line));
-            if (w.about) body.appendChild(el('p', '', w.about));
-            wr.appendChild(body);
-            wb.appendChild(wr);
+            if (line) sec.appendChild(el('p', 'work-meta', line));
+            if (w.about) sec.appendChild(el('p', '', w.about));
+            wb.appendChild(sec);
           });
           wdet.appendChild(wb);
           card.appendChild(wdet);
