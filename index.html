@@ -924,7 +924,13 @@ details[open] > summary::after { transform: none; background-size: 11px 1.5px, 1
 .inner-body > p { margin: 0; }
 .inner-body > p + p { margin-top: 6px; }
 .inner-body .inner-meta { color: var(--muted); font-size: var(--fs-s); }
-.story-body > p + p { margin-top: 10px; }
+/* 깊이 읽기: 펼치면 세 묶음이 한 번에. 장소 정보처럼 회색 이름과 가는 선, 글이 길어 이름은 문단 위에 */
+.story-sec { padding: 10px 0; border-top: 1px solid var(--line); }
+.story-sec:first-child { padding-top: 0; border-top: 0; }
+.story-sec:last-child { padding-bottom: 0; }
+.story-label { margin: 0 0 6px; color: var(--muted); font-size: var(--fs-s); font-weight: 400; line-height: 1.5; }
+.story-sec > p { margin: 0; }
+.story-sec > p + p { margin-top: 10px; }
 /* 장소 사진: 카드 맨 위, 카드 폭 전체 */
 .record-photo { display: block; width: 100%; aspect-ratio: 16 / 9; object-fit: cover; background: var(--line); }
 .credit-link { color: var(--accent); text-decoration: none; overflow-wrap: anywhere; }
@@ -2083,13 +2089,12 @@ details[open] > summary::after { transform: none; background-size: 11px 1.5px, 1
         var storyParts = site && site.story ? STORY_PARTS.filter(function (p) { return site.story[p[0]] && site.story[p[0]].length; }) : [];
         if (storyParts.length) {
           var sdet = foldRow('fold-row record-row', '깊이 읽기', storyParts.length + '가지');
-          var sb = el('div', 'fold-body inner-list');
+          var sb = el('div', 'fold-body');
           storyParts.forEach(function (p) {
-            var sr = foldRow('inner-row', p[1]);
-            var body = el('div', 'inner-body story-body');
-            site.story[p[0]].forEach(function (t) { body.appendChild(el('p', '', t)); });
-            sr.appendChild(body);
-            sb.appendChild(sr);
+            var sec = el('section', 'story-sec');
+            sec.appendChild(el('h4', 'story-label', p[1]));
+            site.story[p[0]].forEach(function (t) { sec.appendChild(el('p', '', t)); });
+            sb.appendChild(sec);
           });
           sdet.appendChild(sb);
           card.appendChild(sdet);
