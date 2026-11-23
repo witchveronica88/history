@@ -167,67 +167,6 @@ button { cursor: pointer; }
   border-radius: 12px;
   background: var(--card);
 }
-.record {
-  border: 1px solid var(--line);
-  border-radius: 12px;
-  background: var(--card);
-}
-.record-top {
-  display: grid;
-  grid-template-columns: 64px minmax(0, 1fr);
-  gap: 16px;
-  align-items: center;
-  padding: 16px;
-  border-bottom: 1px solid var(--line);
-  background: var(--card);
-}
-.date-block {
-  display: flex;
-  min-height: 80px;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding-right: 16px;
-  border-right: 1px solid var(--line);
-  text-align: center;
-}
-.date-block .month,
-.date-block .weekday {
-  color: var(--muted);
-  font-size: var(--fs-s);
-  line-height: 1.35;
-}
-.date-block .day {
-  display: block;
-  font-family: inherit;
-  font-size: var(--fs-xl);
-  font-weight: 700;
-  line-height: 1.35;
-}
-.status {
-  display: inline-flex;
-  min-height: 24px;
-  align-items: center;
-  margin: 0 0 8px;
-  padding: 4px 12px;
-  border-radius: 999px;
-  background: var(--accent-soft);
-  color: var(--accent);
-  font-size: var(--fs-s);
-  font-weight: 700;
-  line-height: 1.35;
-}
-.record h3 {
-  margin: 0;
-  font-size: var(--fs-l);
-  font-weight: 700;
-  line-height: 1.35;
-}
-.place {
-  margin: 8px 0 0;
-  color: var(--muted);
-  font-size: var(--fs-s);
-}
 .program { padding: 16px; }
 .section-row {
   display: flex;
@@ -300,7 +239,6 @@ details:not([open]) > :not(summary) { display: none; }
 .piece-summary-copy { min-width: 0; }
 .piece-title { display: block; font-size: var(--fs-m); font-weight: 700; }
 .piece-credit { display: block; margin-top: 4px; color: var(--muted); font-size: var(--fs-s); font-weight: 400; }
-.record > details > summary { padding: 12px 16px; border-top: 1px solid var(--line); }
 .detail-body { padding: 0 16px 16px; }
 .info-detail > summary { padding-left: 0; padding-right: 0; }
 .info-section { padding-top: 16px; }
@@ -680,14 +618,12 @@ details:not([open]) > :not(summary) { display: none; }
 
 :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 @media (max-width: 440px) {
-  .record-top { grid-template-columns: 56px minmax(0, 1fr); gap: 12px; }
-  .date-block { padding-right: 12px; }
   .term-row { grid-template-columns: 1fr; gap: 4px; }
   .catalogue-grid { grid-template-columns: 1fr; }
 }
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
-  summary::after { transition: none; }
+  summary::after, .visit-plus { transition: none; }
 }
 
   
@@ -708,7 +644,6 @@ details:not([open]) > :not(summary) { display: none; }
 .btn-primary { border: 0; background: var(--accent); color: var(--on-accent); }
 .btn-danger { border: 1px solid var(--line); background: transparent; color: var(--danger); }
 .btn-danger.confirm { border-color: var(--danger); background: var(--danger); color: var(--on-danger); }
-.record-top { grid-template-columns: 76px minmax(0, 1fr); }
 
 .study-tabs { gap: 16px; }
 .era-fold > summary { list-style: none; cursor: pointer; }
@@ -819,7 +754,6 @@ details[open] > summary { box-shadow: inset 0 -1px 0 var(--line); }
 :root { --radius: 16px; --pad: 20px; --row: 52px; --stick: 0px; --max-w: 720px; }
 #study-eras, #study-dictionary, #picks-panel { --stick: 60px; }
 .fold-card,
-.record,
 .timeline-list,
 .empty { overflow: clip; border: 1px solid var(--line); border-radius: var(--radius); background: var(--card); }
 .fold-head { padding: var(--pad); border-bottom: 1px solid var(--line); }
@@ -854,8 +788,7 @@ details[open] > summary::after { transform: none; background-size: 11px 1.5px, 1
 
 .fold-row { border-top: 1px solid var(--line); scroll-margin-top: var(--stick); }
 .fold-card { scroll-margin-top: var(--stick); }
-.fold-head + .fold-row,
-.record-top + .fold-row { border-top: 0; }
+.fold-head + .fold-row { border-top: 0; }
 .fold-row > summary {
   display: flex;
   min-height: var(--row);
@@ -868,13 +801,10 @@ details[open] > summary::after { transform: none; background-size: 11px 1.5px, 1
 .row-meta { flex: 0 0 auto; color: var(--muted); font-size: var(--fs-s); font-weight: 400; }
 .row-year,
 .card-badge,
-.timeline-year,
-.date-block { font-variant-numeric: tabular-nums; }
+.timeline-year { font-variant-numeric: tabular-nums; }
 .row-year { flex: 0 0 auto; color: var(--muted); font-size: var(--fs-s); font-weight: 400; }
-.fold-card > .fold-row[open],
-.record > .fold-row[open] { box-shadow: inset 3px 0 0 var(--accent); }
-.fold-card > .fold-row[open] > summary,
-.record > .fold-row[open] > summary {
+.fold-card > .fold-row[open] { box-shadow: inset 3px 0 0 var(--accent); }
+.fold-card > .fold-row[open] > summary {
   position: sticky;
   top: var(--stick);
   z-index: 3;
@@ -904,7 +834,7 @@ details[open] > summary::after { transform: none; background-size: 11px 1.5px, 1
 .info-table + .related-block { padding-bottom: 0; }
 .info-row dt { color: var(--muted); font-size: var(--fs-s); }
 .info-row dd { margin: 0; }
-/* 한 단계 안쪽 ＋ 줄(대표 작품): 접힌 줄은 내용 폭, 펼친 제목 줄 배경은 카드 폭 전체로 깔고 바깥 막대를 다시 그린다.
+/* 한 단계 안쪽 ＋ 줄(방문 기록의 장소 정보·깊이 읽기·대표 작품·메모): 접힌 줄은 내용 폭, 펼친 제목 줄 배경은 카드 폭 전체로 깔고 바깥 막대를 다시 그린다.
    펼친 내용은 왼쪽 회색 안내선과 함께 14px 들여 쓴다 */
 .inner-list { padding-top: 0; padding-bottom: 8px; }
 .inner-row { border-top: 1px solid var(--line); scroll-margin-top: calc(var(--stick) + var(--row)); }
@@ -943,16 +873,36 @@ details[open] > summary::after { transform: none; background-size: 11px 1.5px, 1
 .quiz-q { margin: 0; cursor: pointer; }
 .quiz-blank { display: inline-block; min-width: 4.5em; min-height: 1.4em; margin: 0 2px; padding: 0 2px; border: 0; border-bottom: 2px solid var(--accent); background: transparent; color: var(--accent); font-weight: 700; line-height: 1.3; vertical-align: -0.2em; }
 .quiz-blank[aria-pressed="true"] { min-width: 0; vertical-align: baseline; }
-/* 장소 사진: 카드 맨 위, 카드 폭 전체 */
-.record-photo { display: block; width: 100%; aspect-ratio: 16 / 9; object-fit: cover; background: var(--line); }
+/* 방문 기록: 지역마다 카드 하나, 줄 = 작은 사진 + 이름/장소 + 오른쪽 위 날짜, 그 아래 ＋. 누르면 그 자리에서 펼친다 */
+.visit-row > summary { padding-top: 12px; padding-bottom: 12px; }
+.visit-thumb { flex: 0 0 56px; width: 56px; height: 42px; border-radius: 4px; background: var(--subtle); object-fit: cover; box-shadow: 0 0 0 1px var(--line); }
+.visit-text { display: flex; flex: 1 1 auto; min-width: 0; flex-direction: column; gap: 2px; }
+.visit-name { color: var(--text); font-size: var(--fs-m); font-weight: 700; line-height: 1.35; }
+.visit-sub { color: var(--muted); font-size: var(--fs-s); font-weight: 400; line-height: 1.35; }
+.visit-row > summary::after { display: none; }
+.visit-side { display: flex; flex: 0 0 auto; flex-direction: column; align-items: flex-end; gap: 8px; }
+.visit-date { color: var(--muted); font-size: var(--fs-s); font-weight: 400; line-height: 1.35; font-variant-numeric: tabular-nums; }
+.visit-plus {
+  width: 11px;
+  height: 11px;
+  margin-right: 2px;
+  background: linear-gradient(var(--muted), var(--muted)) center / 11px 1.5px no-repeat,
+              linear-gradient(var(--muted), var(--muted)) center / 1.5px 11px no-repeat;
+  transition: background-size .16s ease;
+}
+.visit-row[open] > summary .visit-plus { background-size: 11px 1.5px, 1.5px 0; }
+.visit-date.soon { color: var(--text); font-weight: 700; }
+.visit-open .inner-list { padding-top: 0; }
+.visit-row .inner-row { scroll-margin-top: calc(var(--stick) + var(--outer, var(--row))); }
+.visit-row .inner-row[open] > summary { top: calc(var(--stick) + var(--outer, var(--row))); }
+.inner-body .memo-text { padding: 0; color: var(--text); }
+/* 장소 사진: 펼친 기록 맨 위, 카드 폭 전체(왼쪽 강조색 막대 3px는 남긴다) */
+.record-photo { display: block; width: calc(100% - 3px); margin-left: 3px; aspect-ratio: 16 / 9; object-fit: cover; background: var(--line); }
 .credit-link { color: var(--accent); text-decoration: none; overflow-wrap: anywhere; }
 .fold-body > .composer-detail-name { margin: 0 0 8px; padding: 0; }
 .fold-card > .era-notes { margin-top: 0; }
 
-.record-top { padding: var(--pad); }
-.record h3 { font-size: var(--fs-l); line-height: 1.35; }
 .timeline-row { padding: 12px var(--pad); }
-.records > .record { scroll-margin-top: 16px; }
 
 /* 카드가 많으면 탭: 알약 탭 한 줄, 가로로 밀고 위에 고정 */
 .card-tabs {
@@ -2181,8 +2131,169 @@ details[open] > summary::after { transform: none; background-size: 11px 1.5px, 1
     var filter = 'all';
     var recordsPanel = $('records-panel');
     var emptyBox = $('empty');
+    /* 기록 한 줄: [작은 사진][이름 / 장소][날짜 ＋]. 펼치면 큰 사진과 안쪽 ＋ 줄 */
+    function innerRow(name, meta) {
+      var d = el('details', 'inner-row');
+      var sm = el('summary');
+      var nm = el('span', 'row-name');
+      nm.appendChild(el('strong', '', name));
+      if (meta) nm.appendChild(el('span', 'row-meta', meta));
+      sm.appendChild(nm);
+      d.appendChild(sm);
+      return d;
+    }
+    function shortDate(date) {
+      var d = date.split('-');
+      return d[0].slice(2) + '.' + Number(d[1]) + '.' + Number(d[2]);
+    }
+    function visitRow(r, region, isNext, today) {
+      var row = el('details', 'fold-row visit-row');
+      row.setAttribute('data-id', r.id);
+      row.setAttribute('data-status', r._status);
+      var site = r.site && SITES[r.site];
+      var sm = el('summary');
+      var thumb;
+      if (site && site.photo) {
+        thumb = el('img', 'visit-thumb');
+        thumb.src = site.photo.file;
+        thumb.alt = '';
+        thumb.loading = 'lazy';
+        thumb.decoding = 'async';
+      } else {
+        thumb = el('span', 'visit-thumb');
+      }
+      sm.appendChild(thumb);
+      var txt = el('span', 'visit-text');
+      var rest = (r.venue || '').split(' ');
+      if (rest[0] === region) rest.shift();
+      /* 이름 앞의 지역·도시 이름은 아래 줄(장소)과 겹치니 줄에서는 뺀다 */
+      var words = r.title.split(' ');
+      if (words.length > 1 && (words[0] === region || (rest[0] || '').indexOf(words[0]) === 0)) words.shift();
+      txt.appendChild(el('strong', 'visit-name', words.join(' ')));
+      var sub = [fmtTime(r.time), rest.join(' ')].filter(Boolean).join(' · ');
+      if (sub) txt.appendChild(el('span', 'visit-sub', sub));
+      sm.appendChild(txt);
+      var when = r.date ? shortDate(r.date) : '날짜 없음';
+      if (isNext) {
+        var days = Math.round((new Date(r.date + 'T00:00:00+09:00') - new Date(today + 'T00:00:00+09:00')) / 86400000);
+        when = days === 0 ? '오늘' : 'D-' + days;
+      }
+      var side = el('span', 'visit-side');
+      var wd = el('span', 'visit-date' + (isNext ? ' soon' : ''), when);
+      if (r.date) {
+        var p = r.date.split('-');
+        wd.setAttribute('aria-label', p[0] + '년 ' + Number(p[1]) + '월 ' + Number(p[2]) + '일' + (r._status === 'seen' ? ' 방문 완료' : ' 예정'));
+      }
+      side.appendChild(wd);
+      side.appendChild(el('span', 'visit-plus'));
+      sm.appendChild(side);
+      row.appendChild(sm);
+
+      var open = el('div', 'visit-open');
+      if (site && site.photo) {
+        var photo = el('img', 'record-photo');
+        photo.src = site.photo.file;
+        photo.alt = r.title;
+        photo.loading = 'lazy';
+        photo.decoding = 'async';
+        open.appendChild(photo);
+      }
+      var list = el('div', 'fold-body inner-list');
+
+      var hasTopics = r.topics && r.topics.length;
+      var placeHit = D.places.filter(function (p) { return p.name === r.title; })[0];
+      var infoRows = site ? SITE_FIELDS.filter(function (f) { return site[f[0]]; }) : [];
+      var hasInfo = infoRows.length + (site && site.photo ? 1 : 0);
+      if (hasInfo || hasTopics || placeHit) {
+        var idet = innerRow('장소 정보', hasInfo ? hasInfo + '가지' : '');
+        var ib = el('div', 'inner-body');
+        if (hasInfo) {
+          var table = el('dl', 'info-table');
+          infoRows.forEach(function (f) {
+            var ir = el('div', 'info-row');
+            ir.appendChild(el('dt', '', f[1]));
+            ir.appendChild(el('dd', '', site[f[0]]));
+            table.appendChild(ir);
+          });
+          if (site.photo) {
+            var prow = el('div', 'info-row');
+            prow.appendChild(el('dt', '', '사진'));
+            var pdd = el('dd');
+            var credit = el('a', 'credit-link', [site.photo.by, site.photo.license].filter(Boolean).join(' · '));
+            credit.href = site.photo.page;
+            credit.target = '_blank';
+            credit.rel = 'noopener';
+            pdd.appendChild(credit);
+            prow.appendChild(pdd);
+            table.appendChild(prow);
+          }
+          ib.appendChild(table);
+        }
+        if (hasTopics || placeHit) {
+          var rblock = el('div', 'related-block');
+          rblock.appendChild(el('span', 'related-label', '함께 보기'));
+          var rlist = el('div', 'study-link-list');
+          (r.topics || []).forEach(function (n) {
+            var ref = resolveRef(n);
+            if (ref) rlist.appendChild(createLink(n, ref.kind, ref.value));
+            else rlist.appendChild(el('span', 'genre-text', n));
+          });
+          if (placeHit) rlist.appendChild(createLink('가볼 곳에서 보기', 'place', placeHit.name));
+          rblock.appendChild(rlist);
+          ib.appendChild(rblock);
+        }
+        idet.appendChild(ib);
+        list.appendChild(idet);
+      }
+      var storyParts = site && site.story ? STORY_PARTS.filter(function (p) { return site.story[p[0]] && site.story[p[0]].length; }) : [];
+      if (storyParts.length) {
+        var sdet = innerRow('깊이 읽기', storyParts.length + '가지');
+        var sb = el('div', 'inner-body');
+        storyParts.forEach(function (p) {
+          var sec = el('section', 'story-sec');
+          sec.appendChild(el('h4', 'story-label', p[1]));
+          site.story[p[0]].forEach(function (t) { sec.appendChild(el('p', '', t)); });
+          sb.appendChild(sec);
+        });
+        sdet.appendChild(sb);
+        list.appendChild(sdet);
+      }
+      if (site && site.works && site.works.length) {
+        var wdet = innerRow('대표 작품', site.works.length + '점');
+        var wb = el('div', 'inner-body');
+        site.works.forEach(function (w) {
+          var sec = el('section', 'story-sec work-sec');
+          var head = el('div', 'work-head');
+          head.appendChild(el('strong', 'work-name', w.name));
+          if (w.when) head.appendChild(el('span', 'row-year', w.when));
+          sec.appendChild(head);
+          var line = [w.era, w.kind, w.maker].filter(Boolean).join(' · ');
+          if (line) sec.appendChild(el('p', 'work-meta', line));
+          if (w.about) sec.appendChild(el('p', '', w.about));
+          wb.appendChild(sec);
+        });
+        wdet.appendChild(wb);
+        list.appendChild(wdet);
+      }
+      if (r.memo) {
+        var det = innerRow('메모');
+        var mb = el('div', 'inner-body');
+        mb.appendChild(el('p', 'memo-text', r.memo));
+        det.appendChild(mb);
+        list.appendChild(det);
+      }
+      open.appendChild(list);
+      row.appendChild(open);
+      /* 한 번에 하나만 펼친다. 안쪽 제목이 바깥 줄 바로 아래 붙도록 바깥 줄 높이를 기억한다 */
+      row.addEventListener('toggle', function () {
+        if (!row.open) return;
+        row.style.setProperty('--outer', sm.offsetHeight + 'px');
+        qsa('.visit-row[open]').forEach(function (o) { if (o !== row) o.open = false; });
+      });
+      return row;
+    }
     function renderRecords() {
-      qsa('.record', recordsPanel).forEach(function (n) { n.remove(); });
+      qsa('.record-group', recordsPanel).forEach(function (n) { n.remove(); });
       var today = todayKR();
       var counts = { all: records.length, upcoming: 0, seen: 0, picks: D.places.length };
       records.forEach(function (r) { r._status = statusOf(r, today); counts[r._status] += 1; });
@@ -2199,131 +2310,19 @@ details[open] > summary::after { transform: none; background-size: 11px 1.5px, 1
       var picks = filter === 'picks';
       var shown = picks ? [] : sorted.filter(function (r) { return filter === 'all' || r._status === filter; });
 
+      /* 지역(장소 칸 첫 낱말)마다 카드 하나. 최근에 간 지역부터 */
+      var groups = [];
       shown.forEach(function (r) {
-        var card = el('article', 'record');
-        card.setAttribute('data-id', r.id);
-        card.setAttribute('data-status', r._status);
-        var site = r.site && SITES[r.site];
-        if (site && site.photo) {
-          var photo = el('img', 'record-photo');
-          photo.src = site.photo.file;
-          photo.alt = r.title;
-          photo.loading = 'lazy';
-          photo.decoding = 'async';
-          card.appendChild(photo);
-        }
-        var top = el('div', 'record-top');
-        var db = el('div', 'date-block');
-        if (r.date) {
-          var d = r.date.split('-');
-          var weekday = WEEK[new Date(Number(d[0]), Number(d[1]) - 1, Number(d[2])).getDay()];
-          db.setAttribute('aria-label', d[0] + '년 ' + Number(d[1]) + '월 ' + Number(d[2]) + '일 ' + weekday);
-          db.appendChild(el('span', 'month', d[0] + '.' + d[1]));
-          db.appendChild(el('span', 'day', d[2]));
-          db.appendChild(el('span', 'weekday', weekday));
-        } else {
-          db.setAttribute('aria-label', '날짜 없음');
-          db.appendChild(el('span', 'month', '날짜'));
-          db.appendChild(el('span', 'day', '–'));
-          db.appendChild(el('span', 'weekday', '없음'));
-        }
-        top.appendChild(db);
-        var info = el('div');
-        var label = r._status === 'seen' ? '방문 완료' : '예정';
-        if (r === nextUpcoming) {
-          var days = Math.round((new Date(r.date + 'T00:00:00+09:00') - new Date(today + 'T00:00:00+09:00')) / 86400000);
-          label = days === 0 ? '오늘' : 'D-' + days;
-        }
-        info.appendChild(el('span', 'status', label));
-        info.appendChild(el('h3', '', r.title));
-        var place = [fmtTime(r.time), r.venue].filter(Boolean).join(' · ');
-        if (place) info.appendChild(el('p', 'place', place));
-        top.appendChild(info);
-        card.appendChild(top);
-
-        var hasTopics = r.topics && r.topics.length;
-        var placeHit = D.places.filter(function (p) { return p.name === r.title; })[0];
-        var infoRows = site ? SITE_FIELDS.filter(function (f) { return site[f[0]]; }) : [];
-        var hasInfo = infoRows.length + (site && site.photo ? 1 : 0);
-        if (hasInfo || hasTopics || placeHit) {
-          var idet = foldRow('fold-row record-row', '장소 정보', hasInfo ? hasInfo + '가지' : '');
-          var ib = el('div', 'fold-body');
-          if (hasInfo) {
-            var table = el('dl', 'info-table');
-            infoRows.forEach(function (f) {
-              var row = el('div', 'info-row');
-              row.appendChild(el('dt', '', f[1]));
-              row.appendChild(el('dd', '', site[f[0]]));
-              table.appendChild(row);
-            });
-            if (site.photo) {
-              var prow = el('div', 'info-row');
-              prow.appendChild(el('dt', '', '사진'));
-              var pdd = el('dd');
-              var credit = el('a', 'credit-link', [site.photo.by, site.photo.license].filter(Boolean).join(' · '));
-              credit.href = site.photo.page;
-              credit.target = '_blank';
-              credit.rel = 'noopener';
-              pdd.appendChild(credit);
-              prow.appendChild(pdd);
-              table.appendChild(prow);
-            }
-            ib.appendChild(table);
-          }
-          if (hasTopics || placeHit) {
-            var rblock = el('div', 'related-block');
-            rblock.appendChild(el('span', 'related-label', '함께 보기'));
-            var rlist = el('div', 'study-link-list');
-            (r.topics || []).forEach(function (n) {
-              var ref = resolveRef(n);
-              if (ref) rlist.appendChild(createLink(n, ref.kind, ref.value));
-              else rlist.appendChild(el('span', 'genre-text', n));
-            });
-            if (placeHit) rlist.appendChild(createLink('가볼 곳에서 보기', 'place', placeHit.name));
-            rblock.appendChild(rlist);
-            ib.appendChild(rblock);
-          }
-          idet.appendChild(ib);
-          card.appendChild(idet);
-        }
-        var storyParts = site && site.story ? STORY_PARTS.filter(function (p) { return site.story[p[0]] && site.story[p[0]].length; }) : [];
-        if (storyParts.length) {
-          var sdet = foldRow('fold-row record-row', '깊이 읽기', storyParts.length + '가지');
-          var sb = el('div', 'fold-body');
-          storyParts.forEach(function (p) {
-            var sec = el('section', 'story-sec');
-            sec.appendChild(el('h4', 'story-label', p[1]));
-            site.story[p[0]].forEach(function (t) { sec.appendChild(el('p', '', t)); });
-            sb.appendChild(sec);
-          });
-          sdet.appendChild(sb);
-          card.appendChild(sdet);
-        }
-        if (site && site.works && site.works.length) {
-          var wdet = foldRow('fold-row record-row', '대표 작품', site.works.length + '점');
-          var wb = el('div', 'fold-body');
-          site.works.forEach(function (w) {
-            var sec = el('section', 'story-sec work-sec');
-            var head = el('div', 'work-head');
-            head.appendChild(el('strong', 'work-name', w.name));
-            if (w.when) head.appendChild(el('span', 'row-year', w.when));
-            sec.appendChild(head);
-            var line = [w.era, w.kind, w.maker].filter(Boolean).join(' · ');
-            if (line) sec.appendChild(el('p', 'work-meta', line));
-            if (w.about) sec.appendChild(el('p', '', w.about));
-            wb.appendChild(sec);
-          });
-          wdet.appendChild(wb);
-          card.appendChild(wdet);
-        }
-        if (r.memo) {
-          var det = foldRow('fold-row record-row', '메모');
-          var mb = el('div', 'fold-body');
-          mb.appendChild(el('p', 'memo-text', r.memo));
-          det.appendChild(mb);
-          card.appendChild(det);
-        }
-        recordsPanel.insertBefore(card, emptyBox);
+        var key = (r.venue || '').split(' ')[0] || '기타';
+        var g = groups.filter(function (x) { return x.key === key; })[0];
+        if (!g) { g = { key: key, list: [] }; groups.push(g); }
+        g.list.push(r);
+      });
+      groups.forEach(function (g) {
+        var box = foldCard(g.key, g.list.length + '곳');
+        box.classList.add('record-group');
+        g.list.forEach(function (r) { box.appendChild(visitRow(r, g.key, r === nextUpcoming, today)); });
+        recordsPanel.insertBefore(box, emptyBox);
       });
 
       qsa('.filter').forEach(function (b) {
