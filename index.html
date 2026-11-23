@@ -154,6 +154,7 @@ button { cursor: pointer; }
 }
 
 .records,
+#place-list,
 .era-overviews,
 .composer-list,
 .instrument-list { display: grid; gap: 16px; }
@@ -752,7 +753,7 @@ details[open] > summary { box-shadow: inset 0 -1px 0 var(--line); }
 
 /* 카드 규칙: 카드 = 머리 + ＋ 줄. 펼친 줄은 제목 줄에만 옅은 배경, 첫 단계는 왼쪽 끝에 강조색 막대 */
 :root { --radius: 16px; --pad: 20px; --row: 52px; --stick: 0px; --max-w: 720px; }
-#study-eras, #study-dictionary, #picks-panel { --stick: 60px; }
+#study-eras, #study-dictionary, #records-panel, #picks-panel { --stick: 60px; }
 .fold-card,
 .timeline-list,
 .empty { overflow: clip; border: 1px solid var(--line); border-radius: var(--radius); background: var(--card); }
@@ -931,12 +932,7 @@ details[open] > summary::after { transform: none; background-size: 11px 1.5px, 1
     </header>
 
     <section class="view-panel" id="visit-view" role="tabpanel" aria-labelledby="tab-visits">
-      <nav class="filters" aria-label="방문 기록 필터" role="tablist">
-        <button class="filter" id="filter-all" type="button" role="tab" aria-controls="records-panel" aria-selected="true" data-filter="all" data-label="전체">전체 0</button>
-        <button class="filter" id="filter-upcoming" type="button" role="tab" aria-controls="records-panel" aria-selected="false" data-filter="upcoming" data-label="예정">예정 0</button>
-        <button class="filter" id="filter-seen" type="button" role="tab" aria-controls="records-panel" aria-selected="false" data-filter="seen" data-label="방문 완료">방문 완료 0</button>
-        <button class="filter" id="filter-picks" type="button" role="tab" aria-controls="picks-panel" aria-selected="false" data-filter="picks" data-label="추천">추천 0</button>
-      </nav>
+      <nav class="term-filters card-tabs" id="visit-tabs" aria-label="방문 기록 지역"></nav>
       <div class="leftover" id="leftover" hidden>
         <p id="leftover-copy"></p>
         <div class="leftover-actions">
@@ -944,11 +940,10 @@ details[open] > summary::after { transform: none; background-size: 11px 1.5px, 1
           <button class="btn-danger" id="leftover-clear" type="button">지우기</button>
         </div>
       </div>
-      <section class="records" id="records-panel" role="tabpanel" aria-labelledby="filter-all" aria-live="polite" tabindex="0">
+      <section class="records" id="records-panel" aria-live="polite">
         <div class="empty" id="empty" role="status"><strong>기록한 방문이 아직 없다</strong></div>
       </section>
-      <section id="picks-panel" role="tabpanel" aria-labelledby="filter-picks" hidden>
-        <div class="term-filters card-tabs" id="place-filters" aria-label="추천 장소 분류"></div>
+      <section id="picks-panel" hidden>
         <div id="place-list"></div>
       </section>
     </section>
@@ -1507,7 +1502,6 @@ details[open] > summary::after { transform: none; background-size: 11px 1.5px, 1
     var eraRegions = [];
     D.eras.forEach(function (e) { if (eraRegions.indexOf(e.region) === -1) eraRegions.push(e.region); });
     var activeTermCategory = pick(termCategories, savedTabs.term);
-    var activePlaceGroup = pick(placeGroups, savedTabs.place);
     var activeRegion = pick(eraRegions, savedTabs.region);
     /* 내용이 적은 시대는 탭 하나에 카드 여럿으로 묶는다(예: { '한국사 · 조선 전기': '조선' }). 지금은 묶은 시대가 없다 */
     var ERA_TAB = {};
@@ -1796,18 +1790,8 @@ details[open] > summary::after { transform: none; background-size: 11px 1.5px, 1
     }
 
     function renderPlaces() {
-      var filters = $('place-filters');
       var list = $('place-list');
       placeGroups.forEach(function (g) {
-        var btn = el('button', 'term-filter', g);
-        btn.type = 'button';
-        btn.setAttribute('aria-pressed', g === activePlaceGroup ? 'true' : 'false');
-        btn.setAttribute('data-place-group', g);
-        filters.appendChild(btn);
-
-        var panel = el('section');
-        panel.setAttribute('data-place-panel', g);
-        panel.hidden = g !== activePlaceGroup;
         var groupPlaces = D.places.filter(function (p) { return p.group === g; });
         var box = foldCard(g, groupPlaces.length + '곳');
         groupPlaces.forEach(function (p) {
@@ -1825,8 +1809,7 @@ details[open] > summary::after { transform: none; background-size: 11px 1.5px, 1
           d.appendChild(body);
           box.appendChild(d);
         });
-        panel.appendChild(box);
-        list.appendChild(panel);
+        list.appendChild(box);
       });
     }
 
@@ -1888,7 +1871,7 @@ details[open] > summary::after { transform: none; background-size: 11px 1.5px, 1
       window.scrollTo(0, 0);
     }
     function activateStudySection(section) {
-      if (section === 'places') { showScreen('visits'); activateFilter($('filter-picks')); return; }
+      if (section === 'places') { showScreen('visits'); selectVisit(PICKS); return; }
       showScreen(section);
     }
     function selectTermCategory(cat) {
@@ -1898,14 +1881,6 @@ details[open] > summary::after { transform: none; background-size: 11px 1.5px, 1
         b.setAttribute('aria-pressed', b.getAttribute('data-category') === cat ? 'true' : 'false');
       });
       qsa('[data-dictionary-category]').forEach(function (p) { p.hidden = p.getAttribute('data-dictionary-category') !== cat; });
-    }
-    function selectPlaceGroup(g) {
-      activePlaceGroup = g;
-      saveTab('place', g);
-      qsa('#place-filters .term-filter').forEach(function (b) {
-        b.setAttribute('aria-pressed', b.getAttribute('data-place-group') === g ? 'true' : 'false');
-      });
-      qsa('[data-place-panel]').forEach(function (p) { p.hidden = p.getAttribute('data-place-panel') !== g; });
     }
     function reveal(target) {
       if (!target) return;
@@ -1959,7 +1934,6 @@ details[open] > summary::after { transform: none; background-size: 11px 1.5px, 1
         var p = D.places.filter(function (x) { return x.name === value; })[0];
         if (!p) return;
         activateStudySection('places');
-        selectPlaceGroup(p.group);
         reveal(qsa('[data-place-card]').filter(function (c) { return c.getAttribute('data-place-card') === value; })[0]);
         return;
       }
@@ -2089,7 +2063,7 @@ details[open] > summary::after { transform: none; background-size: 11px 1.5px, 1
     }
     var left = leftovers();
     function renderLeftover() {
-      $('leftover').hidden = !left.n || filter === 'picks';
+      $('leftover').hidden = !left.n || activeVisit === PICKS;
       $('leftover-copy').textContent = '이 기기에만 저장된 방문 기록 ' + left.n + '개가 남아 있다. 복사해서 Claude에게 보내면 파일에 옮긴다. 옮긴 뒤에는 지운다.';
     }
     function copyText(text) {
@@ -2128,7 +2102,10 @@ details[open] > summary::after { transform: none; background-size: 11px 1.5px, 1
     }
 
     /* ---------- visits: render ---------- */
-    var filter = 'all';
+    /* 위 탭 = 지역(장소 칸 첫 낱말)마다 하나 + 맨 끝 '추천'. 고른 지역 카드 하나만 보인다 */
+    var PICKS = '추천';
+    var activeVisit = savedTabs.visit || '';
+    function regionOf(r) { return (r.venue || '').split(' ')[0] || '기타'; }
     var recordsPanel = $('records-panel');
     var emptyBox = $('empty');
     /* 기록 한 줄: [작은 사진][이름 / 장소][날짜 ＋]. 펼치면 큰 사진과 안쪽 ＋ 줄 */
@@ -2295,8 +2272,7 @@ details[open] > summary::after { transform: none; background-size: 11px 1.5px, 1
     function renderRecords() {
       qsa('.record-group', recordsPanel).forEach(function (n) { n.remove(); });
       var today = todayKR();
-      var counts = { all: records.length, upcoming: 0, seen: 0, picks: D.places.length };
-      records.forEach(function (r) { r._status = statusOf(r, today); counts[r._status] += 1; });
+      records.forEach(function (r) { r._status = statusOf(r, today); });
       var sorted = records.slice().sort(function (a, b) {
         if (a._status === b._status) {
           if (a._status === 'upcoming') return (a.date || '').localeCompare(b.date || '') || (a.time || '').localeCompare(b.time || '');
@@ -2307,34 +2283,36 @@ details[open] > summary::after { transform: none; background-size: 11px 1.5px, 1
         return a._status === 'upcoming' ? -1 : 1;
       });
       var nextUpcoming = sorted.filter(function (r) { return r._status === 'upcoming' && r.date; })[0];
-      var picks = filter === 'picks';
-      var shown = picks ? [] : sorted.filter(function (r) { return filter === 'all' || r._status === filter; });
 
-      /* 지역(장소 칸 첫 낱말)마다 카드 하나. 최근에 간 지역부터 */
+      /* 지역마다 카드 하나. 최근에 간 지역부터 */
       var groups = [];
-      shown.forEach(function (r) {
-        var key = (r.venue || '').split(' ')[0] || '기타';
+      sorted.forEach(function (r) {
+        var key = regionOf(r);
         var g = groups.filter(function (x) { return x.key === key; })[0];
         if (!g) { g = { key: key, list: [] }; groups.push(g); }
         g.list.push(r);
       });
+      var keys = groups.map(function (g) { return g.key; }).concat([PICKS]);
+      activeVisit = pick(keys, activeVisit);
+      var tabs = $('visit-tabs');
+      while (tabs.firstChild) tabs.removeChild(tabs.firstChild);
+      groups.map(function (g) { return [g.key, g.list.length]; }).concat([[PICKS, D.places.length]]).forEach(function (t) {
+        var b = el('button', 'term-filter', t[0] + ' ' + t[1]);
+        b.type = 'button';
+        b.setAttribute('data-visit-tab', t[0]);
+        b.addEventListener('click', function () { selectVisit(t[0]); });
+        tabs.appendChild(b);
+      });
       groups.forEach(function (g) {
         var box = foldCard(g.key, g.list.length + '곳');
         box.classList.add('record-group');
+        box.setAttribute('data-visit-group', g.key);
         g.list.forEach(function (r) { box.appendChild(visitRow(r, g.key, r === nextUpcoming, today)); });
         recordsPanel.insertBefore(box, emptyBox);
       });
 
-      qsa('.filter').forEach(function (b) {
-        b.textContent = b.getAttribute('data-label') + ' ' + counts[b.getAttribute('data-filter')];
-      });
-      emptyBox.style.display = (picks || shown.length) ? 'none' : 'block';
-      recordsPanel.hidden = picks;
-      $('picks-panel').hidden = !picks;
-      renderLeftover();
-      if (!shown.length) {
-        emptyBox.querySelector('strong').textContent = !records.length ? '기록한 방문이 아직 없다' : filter === 'upcoming' ? '예정된 방문이 없다' : '방문 완료 기록이 아직 없다';
-      }
+      emptyBox.style.display = records.length ? 'none' : 'block';
+      applyVisitTab();
       updatePlaceStates();
     }
     function updatePlaceStates() {
@@ -2346,15 +2324,25 @@ details[open] > summary::after { transform: none; background-size: 11px 1.5px, 1
         n.textContent = seen[name] ? '방문 완료' : (p ? p.where : '');
       });
     }
-    function activateFilter(button) {
-      filter = button.getAttribute('data-filter');
-      qsa('.filter').forEach(function (b) {
-        var sel = b === button;
-        b.setAttribute('aria-selected', sel ? 'true' : 'false');
-        b.tabIndex = sel ? 0 : -1;
+    function applyVisitTab() {
+      var picks = activeVisit === PICKS;
+      qsa('#visit-tabs [data-visit-tab]').forEach(function (b) {
+        var sel = b.getAttribute('data-visit-tab') === activeVisit;
+        b.setAttribute('aria-pressed', sel ? 'true' : 'false');
+        if (sel) b.scrollIntoView({ block: 'nearest', inline: 'nearest' });
       });
-      recordsPanel.setAttribute('aria-labelledby', button.id);
-      renderRecords();
+      qsa('[data-visit-group]').forEach(function (c) { c.hidden = c.getAttribute('data-visit-group') !== activeVisit; });
+      recordsPanel.hidden = picks;
+      $('picks-panel').hidden = !picks;
+      renderLeftover();
+    }
+    /* 탭 줄이 위에 붙어 있으면 고른 카드 맨 위로 올린다 */
+    function selectVisit(key) {
+      activeVisit = key;
+      saveTab('visit', key);
+      applyVisitTab();
+      var card = key === PICKS ? $('place-list').firstChild : qsa('[data-visit-group]').filter(function (c) { return !c.hidden; })[0];
+      if (card && card.getBoundingClientRect().top < 60) card.scrollIntoView({ block: 'start' });
     }
 
     /* ---------- init + events ---------- */
@@ -2382,15 +2370,9 @@ details[open] > summary::after { transform: none; background-size: 11px 1.5px, 1
     }
     bottomTabs.forEach(function (b) { b.addEventListener('click', function () { closeSearch(); showScreen(b.getAttribute('data-screen')); }); });
     wireTablist(bottomTabs, function (b) { showScreen(b.getAttribute('data-screen')); });
-    var filters = qsa('.filter');
-    filters.forEach(function (b) { b.addEventListener('click', function () { activateFilter(b); }); });
-    wireTablist(filters, activateFilter);
 
     qsa('#dictionary-filters .term-filter').forEach(function (b) {
       b.addEventListener('click', function () { selectTermCategory(b.getAttribute('data-category')); });
-    });
-    qsa('#place-filters .term-filter').forEach(function (b) {
-      b.addEventListener('click', function () { selectPlaceGroup(b.getAttribute('data-place-group')); });
     });
     qsa('#era-picker .term-filter').forEach(function (b) {
       b.addEventListener('click', function () { setEra(b.getAttribute('data-era-jump')); });
