@@ -936,18 +936,13 @@ details[open] > summary::after { transform: none; background-size: 11px 1.5px, 1
 .work-name { min-width: 0; font-size: var(--fs-m); font-weight: 700; }
 .work-sec > .work-meta { color: var(--muted); font-size: var(--fs-s); }
 .work-sec > .work-meta + p { margin-top: 6px; }
-/* 빈칸 문제: 문제 사이 가는 선. 빈칸(강조색 밑줄)을 누르면 답이 보이고 알았다·몰랐다 버튼이 나온다 */
+/* 빈칸 문제: 문제 사이 가는 선. 빈칸은 강조색 밑줄, 누르면 그 자리에 답(강조색 굵게) */
 .quiz-item { padding: 12px 0; border-top: 1px solid var(--line); }
 .quiz-item:first-child { padding-top: 0; border-top: 0; }
 .quiz-item:last-child { padding-bottom: 0; }
 .quiz-q { margin: 0; cursor: pointer; }
-.quiz-blank { display: inline-block; width: 4.5em; height: 1.4em; margin: 0 2px; padding: 0; border: 0; border-bottom: 2px solid var(--accent); background: transparent; vertical-align: -0.2em; }
-.quiz-answer { color: var(--accent); }
-.quiz-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 10px; }
-.quiz-actions[hidden], .quiz-next[hidden] { display: none; }
-.quiz-btn { min-height: 44px; border: 1px solid var(--line); border-radius: 12px; background: transparent; color: var(--text); font-size: var(--fs-s); font-weight: 700; }
-.quiz-next { margin: 6px 0 0; color: var(--muted); font-size: var(--fs-s); font-variant-numeric: tabular-nums; }
-.quiz-empty { margin: 0; padding: var(--pad); color: var(--muted); }
+.quiz-blank { display: inline-block; min-width: 4.5em; min-height: 1.4em; margin: 0 2px; padding: 0 2px; border: 0; border-bottom: 2px solid var(--accent); background: transparent; color: var(--accent); font-weight: 700; line-height: 1.3; vertical-align: -0.2em; }
+.quiz-blank[aria-pressed="true"] { min-width: 0; vertical-align: baseline; }
 /* 장소 사진: 카드 맨 위, 카드 폭 전체 */
 .record-photo { display: block; width: 100%; aspect-ratio: 16 / 9; object-fit: cover; background: var(--line); }
 .credit-link { color: var(--accent); text-decoration: none; overflow-wrap: anywhere; }
@@ -1469,7 +1464,7 @@ details[open] > summary::after { transform: none; background-size: 11px 1.5px, 1
         }
       }
     };
-    /* 빈칸 문제: q의 ____가 빈칸, a가 답. id는 복습 기록(history-quiz-v1)의 열쇠라 바꾸지 않는다 */
+    /* 빈칸 문제: q의 ____가 빈칸, a가 답 */
     var QUIZ = [
       { id: 'k01', era: '한국사 · 고조선과 삼국', q: '『삼국유사』는 단군왕검이 \'널리 사람을 이롭게 한다\'는 ____의 뜻으로 고조선을 세웠다고 전한다.', a: '홍익인간' },
       { id: 'k02', era: '한국사 · 고조선과 삼국', q: '고구려 ____이 불교를 받아들이고 태학을 세우고 율령을 반포해 나라의 틀을 갖췄다.', a: '소수림왕' },
@@ -1567,13 +1562,9 @@ details[open] > summary::after { transform: none; background-size: 11px 1.5px, 1
     /* 내용이 적은 시대는 탭 하나에 카드 여럿으로 묶는다(예: { '한국사 · 조선 전기': '조선' }). 지금은 묶은 시대가 없다 */
     var ERA_TAB = {};
     function tabKey(name) { return eraByName[name].region + ' · ' + (ERA_TAB[name] || name.split(' · ')[1]); }
-    /* 빈칸 문제가 있는 지역은 시대 탭 끝에 '복습' 탭을 둔다 */
-    var REVIEW = '복습';
-    function isReviewKey(key) { return String(key).split(' · ')[1] === REVIEW; }
     function tabsOf(r) {
       var a = [];
       D.eras.forEach(function (e) { if (e.region === r && a.indexOf(tabKey(e.name)) === -1) a.push(tabKey(e.name)); });
-      if (QUIZ.some(function (q) { return eraByName[q.era].region === r; })) a.push(r + ' · ' + REVIEW);
       return a;
     }
     function savedEra(r) {
@@ -1649,28 +1640,8 @@ details[open] > summary::after { transform: none; background-size: 11px 1.5px, 1
       return d;
     }
 
-    /* ---------- 빈칸 문제와 복습 ----------
-       빈칸을 누르면 답이 보이고, 알았다·몰랐다로 다음 복습 날을 정한다.
-       몰랐다 = 다음 날, 알았다 = 3일 → 7일 → 14일 뒤. 기록은 이 기기 브라우저(history-quiz-v1)에만 남는다 */
-    var QUIZ_KEY = 'history-quiz-v1';
-    var QUIZ_GAPS = [1, 3, 7, 14];
-    var quizState = {};
-    try { quizState = JSON.parse(window.localStorage.getItem(QUIZ_KEY)) || {}; } catch (err) { quizState = {}; }
-    function dayStr(offset) {
-      var d = new Date();
-      d.setDate(d.getDate() + (offset || 0));
-      return d.getFullYear() + '-' + ('0' + (d.getMonth() + 1)).slice(-2) + '-' + ('0' + d.getDate()).slice(-2);
-    }
-    function isDue(id) { var st = quizState[id]; return !!(st && st.due && st.due <= dayStr(0)); }
-    function nextText(id) { var st = quizState[id]; return st && st.due && st.due > dayStr(0) ? '다음 복습 ' + st.due.slice(5).replace('-', '.') : ''; }
-    function gradeQuiz(id, knew) {
-      var st = quizState[id] || { box: 0 };
-      st.box = knew ? Math.min((st.box || 0) + 1, QUIZ_GAPS.length - 1) : 0;
-      st.due = dayStr(QUIZ_GAPS[st.box]);
-      quizState[id] = st;
-      try { window.localStorage.setItem(QUIZ_KEY, JSON.stringify(quizState)); } catch (err) {}
-      updateReviewCounts();
-    }
+    /* ---------- 빈칸 문제 ----------
+       빈칸이나 문장을 누르면 답이 보이고, 다시 누르면 빈칸으로 돌아간다 */
     function quizItem(q) {
       var item = el('div', 'quiz-item');
       var parts = q.q.split('____');
@@ -1678,75 +1649,22 @@ details[open] > summary::after { transform: none; background-size: 11px 1.5px, 1
       var blank = el('button', 'quiz-blank');
       blank.type = 'button';
       blank.setAttribute('aria-label', '답 보기');
+      blank.setAttribute('aria-pressed', 'false');
       p.appendChild(document.createTextNode(parts[0]));
       p.appendChild(blank);
       p.appendChild(document.createTextNode(parts[1]));
-      item.appendChild(p);
-      var acts = el('div', 'quiz-actions');
-      acts.hidden = true;
-      var next = el('p', 'quiz-next', nextText(q.id));
-      next.hidden = !next.textContent;
-      [['알았다', true], ['몰랐다', false]].forEach(function (b) {
-        var btn = el('button', 'quiz-btn', b[0]);
-        btn.type = 'button';
-        btn.addEventListener('click', function () {
-          gradeQuiz(q.id, b[1]);
-          acts.hidden = true;
-          next.textContent = nextText(q.id);
-          next.hidden = false;
-        });
-        acts.appendChild(btn);
+      p.addEventListener('click', function () {
+        var shown = blank.getAttribute('aria-pressed') !== 'true';
+        blank.setAttribute('aria-pressed', shown ? 'true' : 'false');
+        blank.textContent = shown ? q.a : '';
       });
-      function show() {
-        if (!blank.parentNode) return;
-        p.replaceChild(el('strong', 'quiz-answer', q.a), blank);
-        acts.hidden = false;
-      }
-      p.addEventListener('click', show);
-      item.appendChild(acts);
-      item.appendChild(next);
+      item.appendChild(p);
       return item;
     }
     function quizBody(list) {
       var body = el('div', 'fold-body');
       list.forEach(function (q) { body.appendChild(quizItem(q)); });
       return body;
-    }
-    function dueOf(r) { return QUIZ.filter(function (q) { return eraByName[q.era].region === r && isDue(q.id); }); }
-    function fillReview(card, r) {
-      while (card.firstChild) card.removeChild(card.firstChild);
-      var due = dueOf(r);
-      var head = el('div', 'fold-head');
-      var t = el('div', 'fold-title');
-      t.appendChild(el('h3', '', '오늘 복습'));
-      var badge = el('span', 'card-badge review-badge', due.length + '문제');
-      badge.hidden = !due.length;
-      t.appendChild(badge);
-      head.appendChild(t);
-      card.appendChild(head);
-      if (!due.length) { card.appendChild(el('p', 'quiz-empty', '오늘 복습할 문제가 없다')); return; }
-      D.eras.forEach(function (e) {
-        var qs = due.filter(function (q) { return q.era === e.name; });
-        if (!qs.length) return;
-        var row = foldRow('fold-row quiz-row', e.name.split(' · ')[1], qs.length + '문제');
-        row.appendChild(quizBody(qs));
-        card.appendChild(row);
-      });
-    }
-    function updateReviewCounts() {
-      qsa('#era-picker [data-era-jump]').forEach(function (b) {
-        var key = b.getAttribute('data-era-jump');
-        if (!isReviewKey(key)) return;
-        var n = dueOf(key.split(' · ')[0]).length;
-        b.textContent = REVIEW + (n ? ' ' + n : '');
-      });
-      qsa('[data-review-card]').forEach(function (c) {
-        var b = c.querySelector('.review-badge');
-        if (!b) return;
-        var n = dueOf(c.getAttribute('data-region')).length;
-        b.textContent = n + '문제';
-        b.hidden = !n;
-      });
     }
 
     function renderEras() {
@@ -1831,28 +1749,6 @@ details[open] > summary::after { transform: none; background-size: 11px 1.5px, 1
         row.appendChild(quizBody(qs));
         g.appendChild(row);
       });
-      /* 지역마다 '복습' 탭과 '오늘 복습' 카드 */
-      eraRegions.forEach(function (r) {
-        var key = r + ' · ' + REVIEW;
-        if (tabsOf(r).indexOf(key) === -1) return;
-        var card = el('section', 'fold-card');
-        card.tabIndex = -1;
-        card.setAttribute('data-era-card', key);
-        card.setAttribute('data-era-tab', key);
-        card.setAttribute('data-region', r);
-        card.setAttribute('data-review-card', '');
-        card.hidden = key !== activeEra;
-        fillReview(card, r);
-        holder.appendChild(card);
-        var t = el('button', 'term-filter', REVIEW);
-        t.type = 'button';
-        t.hidden = r !== activeRegion;
-        t.setAttribute('aria-pressed', key === activeEra ? 'true' : 'false');
-        t.setAttribute('data-era-jump', key);
-        t.setAttribute('data-region', r);
-        picker.appendChild(t);
-      });
-      updateReviewCounts();
     }
 
     var timelineFilter = '전체';
@@ -1992,7 +1888,7 @@ details[open] > summary::after { transform: none; background-size: 11px 1.5px, 1
       qsa('#era-picker .term-filter').forEach(function (b) { b.hidden = b.getAttribute('data-region') !== r; });
       setEra(savedEra(r));
     }
-    /* 시대 탭: 고른 탭의 시대 카드만 보인다(ERA_TAB으로 묶으면 여러 장, '복습' 탭은 오늘 복습 카드). 탭 줄이 위에 붙어 있으면 카드 맨 위로 올린다.
+    /* 시대 탭: 고른 탭의 시대 카드만 보인다(ERA_TAB으로 묶으면 여러 장). 탭 줄이 위에 붙어 있으면 카드 맨 위로 올린다.
        시대 이름이나 탭 이름(지역 · 탭)을 받는다 */
     function setEra(name) {
       var key = eraByName[name] ? tabKey(name) : name;
@@ -2000,10 +1896,6 @@ details[open] > summary::after { transform: none; background-size: 11px 1.5px, 1
       if (tabsOf(region).indexOf(key) === -1) return;
       activeEra = key;
       saveTab('era:' + region, key);
-      if (isReviewKey(key)) {
-        qsa('[data-review-card]').forEach(function (c) { if (c.getAttribute('data-region') === region) fillReview(c, region); });
-        updateReviewCounts();
-      }
       var tab = null;
       qsa('#era-picker .term-filter').forEach(function (b) {
         var sel = b.getAttribute('data-era-jump') === key;
