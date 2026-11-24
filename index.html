@@ -867,7 +867,13 @@ details[open] > summary::after { transform: none; background-size: 11px 1.5px, 1
 .work-name { min-width: 0; font-size: var(--fs-m); font-weight: 700; }
 .work-sec > .work-meta { color: var(--muted); font-size: var(--fs-s); }
 .work-sec > .work-meta + p { margin-top: 6px; }
-/* 빈칸 문제: 문제 사이 가는 선. 빈칸은 강조색 밑줄, 누르면 그 자리에 답(강조색 굵게) */
+/* 빈칸 문제: 줄은 강조색 물음표 아이콘 + 옅은 강조색 바탕(펼쳐도 같은 바탕). 문제 사이 가는 선. 빈칸은 강조색 밑줄, 누르면 그 자리에 답(강조색 굵게) */
+.fold-card > .quiz-row > summary,
+.fold-card > .quiz-row[open] > summary { background: var(--accent-soft); }
+.quiz-icon { display: inline-flex; flex: 0 0 auto; }
+.quiz-icon svg { width: 22px; height: 22px; fill: none; stroke: var(--accent); stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.quiz-icon .dot { fill: var(--accent); stroke: none; }
+.quiz-row .row-meta { color: var(--accent); }
 .quiz-item { padding: 12px 0; border-top: 1px solid var(--line); }
 .quiz-item:first-child { padding-top: 0; border-top: 0; }
 .quiz-item:last-child { padding-bottom: 0; }
@@ -1745,6 +1751,11 @@ details[open] > summary::after { transform: none; background-size: 11px 1.5px, 1
         var qs = QUIZ.filter(function (q) { return q.era === g.getAttribute('data-era-events'); });
         if (!qs.length) return;
         var row = foldRow('fold-row quiz-row', '빈칸 문제', qs.length + '문제');
+        /* 퀴즈 줄은 강조색 아이콘(물음표)과 옅은 강조색 바탕으로 따로 보이게 한다 */
+        var icon = el('span', 'quiz-icon');
+        icon.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M9.6 9.4a2.5 2.5 0 1 1 3.4 2.4c-.6.3-1 .8-1 1.5v.4"/><circle class="dot" cx="12" cy="16.9" r=".9"/></svg>';
+        var qsm = row.querySelector('summary');
+        qsm.insertBefore(icon, qsm.firstChild);
         row.appendChild(quizBody(qs));
         g.appendChild(row);
       });
